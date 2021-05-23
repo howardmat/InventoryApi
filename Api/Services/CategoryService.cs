@@ -6,7 +6,6 @@ using Data.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -27,14 +26,14 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> ListAsync()
+        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> ListAsync(CategoryType categoryType)
         {
             var response = new ServiceResponse<IEnumerable<CategoryModel>>();
 
             try
             {
                 // Fetch data
-                var data = await _unitOfWork.CategoryRepository.ListAsync();
+                var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType);
 
                 // Add to collection
                 var list = new List<CategoryModel>();
@@ -49,6 +48,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("CategoryService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -77,55 +78,48 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("CategoryService.GetAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> CreateAsync(CategoryModel model, int createdByUserId)
+        public async Task<ServiceResponse<CategoryModel>> CreateAsync(CategoryModel model, CategoryType categoryType, int createdByUserId)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
-                // Get tenant id from user
-                var user = await _unitOfWork.UserRepository.FindByIdAsync(createdByUserId);
-                var tenantId = user.TenantId;
-                if (tenantId.HasValue)
+                // Build and add the new object
+                var now = DateTime.UtcNow;
+                var category = new Category
                 {
-                    // Build and add the new object
-                    var now = DateTime.UtcNow;
-                    var category = new Category
-                    {
-                        Name = model.Name,
-                        TenantId = tenantId.Value,
-                        CreatedUserId = createdByUserId,
-                        CreatedUtc = now,
-                        LastModifiedUserId = createdByUserId,
-                        LastModifiedUtc = now
-                    };
-                    await _unitOfWork.CategoryRepository.AddAsync(category);
+                    Name = model.Name,
+                    Type = categoryType,
+                    CreatedUserId = createdByUserId,
+                    CreatedUtc = now,
+                    LastModifiedUserId = createdByUserId,
+                    LastModifiedUtc = now
+                };
+                await _unitOfWork.CategoryRepository.AddAsync(category);
 
-                    // Set response
-                    if (await _unitOfWork.CompleteAsync() > 0)
-                    {
-                        response.Data = _mapper.Map<CategoryModel>(category);
-                    }
-                    else
-                    {
-                        response.AddError($"An unexpected error occurred while saving the Category object");
-                        response.SetError();
-                    }
+                // Set response
+                if (await _unitOfWork.CompleteAsync() > 0)
+                {
+                    response.Data = _mapper.Map<CategoryModel>(category);
                 }
                 else
                 {
-                    response.AddError($"TenantId not set for User");
+                    response.AddError($"An unexpected error occurred while saving the Category object");
                     response.SetError();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("CategoryService.CreateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -162,6 +156,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("CategoryService.UpdateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -196,6 +192,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("CategoryService.DeleteAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

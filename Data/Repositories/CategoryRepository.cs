@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Enums;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +12,12 @@ namespace Data.Repositories
         private InventoryDbContext _context => Context as InventoryDbContext;
         public CategoryRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Category>> ListAsync()
+        public async Task<IEnumerable<Category>> ListAsync(CategoryType categoryType)
         {
             return await (from c in _context.Category
                           orderby c.Name
                           where !c.DeletedUtc.HasValue
+                            && c.Type == categoryType
                           select c)
                         .ToListAsync();
         }

@@ -1,19 +1,25 @@
 ﻿using Api.Extensions;
 using Api.Models;
 using Api.Services;
+using Data.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class MaterialCategoryController : ControllerBase
     {
+        private const CategoryType CATEGORY_TYPE = CategoryType.Material;
+
         private readonly CategoryService _categoryService;
 
-        public CategoryController(
+        public MaterialCategoryController(
             CategoryService categoryService)
         {
             _categoryService = categoryService;
@@ -24,7 +30,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
             // Get data from service
-            var result = await _categoryService.ListAsync();
+            var result = await _categoryService.ListAsync(CATEGORY_TYPE);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -45,9 +51,9 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            var result = await _categoryService.CreateAsync(model, userId);
+            var result = await _categoryService.CreateAsync(model, CATEGORY_TYPE, userId);
             return this.GetResultFromServiceResponse(result,
-                Url.Action("Get", "Category", new { id = result.Data?.Id }));
+                Url.Action("Get", "MaterialCategory", new { id = result.Data?.Id }));
         }
 
         // PUT api/<controller>/5

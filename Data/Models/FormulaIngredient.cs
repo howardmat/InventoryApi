@@ -1,12 +1,12 @@
 ﻿namespace Data.Models
 {
-    public class MaterialInventoryTransaction : InventoryBaseModel
+    public class FormulaIngredient : InventoryBaseModel
     {
+        public int FormulaId { get; set; }
         public int MaterialId { get; set; }
         public decimal Quantity { get; set; }
-        public decimal AmountPaid { get; set; }
-        public string Description { get; set; }
 
+        public virtual Formula Formula { get; set; }
         public virtual Material Material { get; set; }
     }
 }

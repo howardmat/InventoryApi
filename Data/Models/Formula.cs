@@ -2,7 +2,7 @@
 
 namespace Data.Models
 {
-    public class Recipe : InventoryBaseModel
+    public class Formula : InventoryBaseModel
     {
         public int CategoryId { get; set; }
         public string Name { get; set; }
@@ -10,6 +10,6 @@ namespace Data.Models
         public string ImageFilename { get; set; }
 
         public virtual Category Category { get; set; }
-        public virtual ICollection<RecipeIngredient> Ingredients { get; set; } = new HashSet<RecipeIngredient>();
+        public virtual ICollection<FormulaIngredient> Ingredients { get; set; } = new HashSet<FormulaIngredient>();
     }
 }

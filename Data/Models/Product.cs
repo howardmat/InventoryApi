@@ -10,6 +10,6 @@
         public string ImageFilename { get; set; }
 
         public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
-        public virtual Recipe Recipe { get; set; }
+        public virtual Formula Recipe { get; set; }
     }
 }

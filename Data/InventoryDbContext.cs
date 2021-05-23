@@ -14,8 +14,8 @@ namespace Data
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductInventoryTransaction> ProductInventoryTransaction { get; set; }
         public DbSet<Province> Province { get; set; }
-        public DbSet<Recipe> Recipe { get; set; }
-        public DbSet<RecipeIngredient> RecipeIngredient { get; set; }
+        public DbSet<Formula> Recipe { get; set; }
+        public DbSet<FormulaIngredient> RecipeIngredient { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
         public DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
         public DbSet<User> User { get; set; }
