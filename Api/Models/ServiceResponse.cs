@@ -29,14 +29,14 @@ namespace Api.Models
 
         public void SetError(string error)
         {
-            _status = ServiceResponseStatus.Error;
+            SetError();
 
             _errors.Add(error);
         }
 
         public void SetError(IEnumerable<string> errors)
         {
-            _status = ServiceResponseStatus.Error;
+            SetError();
 
             foreach (var error in errors)
                 _errors.Add(error);
@@ -49,14 +49,14 @@ namespace Api.Models
 
         public void SetNotFound(string error)
         {
-            _status = ServiceResponseStatus.NotFound;
+            SetNotFound();
 
             _errors.Add(error);
         }
 
         public void SetNotFound(IEnumerable<string> errors)
         {
-            _status = ServiceResponseStatus.NotFound;
+            SetNotFound();
 
             foreach (var error in errors)
                 _errors.Add(error);
@@ -69,14 +69,14 @@ namespace Api.Models
 
         public void SetException(string error)
         {
-            _status = ServiceResponseStatus.Exception;
+            SetException();
 
             _errors.Add(error);
         }
 
         public void SetException(IEnumerable<string> errors)
         {
-            _status = ServiceResponseStatus.Exception;
+            SetException();
 
             foreach (var error in errors)
                 _errors.Add(error);
