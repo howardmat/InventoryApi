@@ -42,14 +42,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"Unable to locate User object ({id})");
-                    response.SetNotFound();
+                    response.SetNotFound($"Unable to locate User object ({id})");
                 }
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("UserService.GetAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -90,14 +90,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"An unexpected error occurred while saving the Category object");
-                    response.SetError();
+                    response.SetError($"An unexpected error occurred while saving the Category object");
                 }
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("UserService.CreateOrUpdateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

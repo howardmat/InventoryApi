@@ -47,6 +47,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("CountryService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

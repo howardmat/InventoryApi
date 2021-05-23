@@ -71,8 +71,7 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"Unable to locate Category object ({id})");
-                    response.SetNotFound();
+                    response.SetNotFound($"Unable to locate Category object ({id})");
                 }
             }
             catch (Exception ex)
@@ -111,8 +110,7 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"An unexpected error occurred while saving the Category object");
-                    response.SetError();
+                    response.SetError($"An unexpected error occurred while saving the Category object");
                 }
             }
             catch (Exception ex)
@@ -143,14 +141,12 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while saving the Category object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while saving the Category object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Category object ({id})");
+                    response.SetNotFound($"Unable to locate Category object ({id})");
                 }
             }
             catch (Exception ex)
@@ -179,14 +175,12 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while removing the Category object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while removing the Category object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Category object ({id})");
+                    response.SetNotFound($"Unable to locate Category object ({id})");
                 }
             }
             catch (Exception ex)

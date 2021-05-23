@@ -47,8 +47,9 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("TenantService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -70,14 +71,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"Unable to locate Tenant object ({id})");
-                    response.SetNotFound();
+                    response.SetNotFound($"Unable to locate Tenant object ({id})");
                 }
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("TenantService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -130,21 +131,19 @@ namespace Api.Services
                     }
                     else
                     {
-                        response.AddError($"An unexpected error occurred while saving the Tenant object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while saving the Tenant object");
                     }
                 }
                 else
                 {
-                    response.AddError($"Unable to locate the User. Failed to create the Tenant object");
-                    response.SetError();
+                    response.SetError($"Unable to locate the User. Failed to create the Tenant object");
                 }
             }
             catch (Exception ex)
             {
-                response.AddError(ex.Message);
-                response.SetException();
                 _logger.LogError("TenantService.CreateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -176,20 +175,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while saving the Tenant object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while saving the Tenant object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Tenant object ({id})");
+                    response.SetNotFound($"Unable to locate Tenant object ({id})");
                 }
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("TenantService.UpdateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -211,20 +209,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while removing the Tenant object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while removing the Tenant object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Tenant object ({id})");
+                    response.SetNotFound($"Unable to locate Tenant object ({id})");
                 }
             }
             catch (Exception ex)
             {
-                response.SetException();
                 _logger.LogError("TenantService.DeleteAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

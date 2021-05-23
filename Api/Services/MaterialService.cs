@@ -48,6 +48,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("MaterialService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -69,13 +71,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"Unable to locate Material object ({id})");
-                    response.SetNotFound();
+                    response.SetNotFound($"Unable to locate Material object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("MaterialService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -117,22 +120,19 @@ namespace Api.Services
                     }
                     else
                     {
-                        response.AddError($"An unexpected error occurred while saving the Material object");
-                        response.SetError();
+                        response.SetError("An unexpected error occurred while saving the Material object");
                     }
                 }
                 else
                 {
-                    response.AddError($"TenantId not set for User");
-                    response.SetError();
+                    response.SetError("TenantId not set for User");
                 }
-
-
             }
             catch (Exception ex)
             {
-                response.AddError(ex.Message);
                 _logger.LogError("MaterialService.CreateAsync - exception:{@Exception}", ex);
+
+                response.SetException(ex.Message);
             }
 
             return response;
@@ -159,19 +159,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while saving the Material object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while saving the Material object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Material object ({id})");
+                    response.SetNotFound($"Unable to locate Material object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("MaterialService.UpdateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -193,19 +193,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while removing the Material object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while removing the Material object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate Material object ({id})");
+                    response.SetNotFound($"Unable to locate Material object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("MaterialService.DeleteAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

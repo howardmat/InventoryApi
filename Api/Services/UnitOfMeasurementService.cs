@@ -48,6 +48,8 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogError("UnitOfMeasurementService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -69,13 +71,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"Unable to locate UnitOfMeasurement object ({id})");
-                    response.SetNotFound();
+                    response.SetNotFound($"Unable to locate UnitOfMeasurement object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("UnitOfMeasurementService.ListAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -108,13 +111,14 @@ namespace Api.Services
                 }
                 else
                 {
-                    response.AddError($"An unexpected error occurred while saving the UnitOfMeasurement object");
-                    response.SetError();
+                    response.SetError($"An unexpected error occurred while saving the UnitOfMeasurement object");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("UnitOfMeasurementService.CreateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -139,19 +143,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while saving the UnitOfMeasurement object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while saving the UnitOfMeasurement object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate UnitOfMeasurement object ({id})");
+                    response.SetNotFound($"Unable to locate UnitOfMeasurement object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("UnitOfMeasurementService.UpdateAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;
@@ -173,19 +177,19 @@ namespace Api.Services
                     // Set response
                     if (!(await _unitOfWork.CompleteAsync() > 0))
                     {
-                        response.AddError($"An unexpected error occurred while removing the UnitOfMeasurement object");
-                        response.SetError();
+                        response.SetError($"An unexpected error occurred while removing the UnitOfMeasurement object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound();
-                    response.AddError($"Unable to locate UnitOfMeasurement object ({id})");
+                    response.SetNotFound($"Unable to locate UnitOfMeasurement object ({id})");
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("UnitOfMeasurementService.DeleteAsync - exception:{@Exception}", ex);
+
+                response.SetException();
             }
 
             return response;

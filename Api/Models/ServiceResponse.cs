@@ -19,9 +19,68 @@ namespace Api.Models
         }
 
         public ServiceResponseStatus GetStatus() => _status;
-        public ServiceResponseStatus SetError() => _status = ServiceResponseStatus.Error;
-        public ServiceResponseStatus SetNotFound() => _status = ServiceResponseStatus.NotFound;
-        public ServiceResponseStatus SetException() => _status = ServiceResponseStatus.Exception;
+
+        public ServiceResponseStatus SetError() 
+        {
+            _status = ServiceResponseStatus.Error;
+
+            return _status;
+        }
+
+        public void SetError(string error)
+        {
+            _status = ServiceResponseStatus.Error;
+
+            _errors.Add(error);
+        }
+
+        public void SetError(IEnumerable<string> errors)
+        {
+            _status = ServiceResponseStatus.Error;
+
+            foreach (var error in errors)
+                _errors.Add(error);
+        }
+
+        public void SetNotFound()
+        {
+            _status = ServiceResponseStatus.NotFound;
+        }
+
+        public void SetNotFound(string error)
+        {
+            _status = ServiceResponseStatus.NotFound;
+
+            _errors.Add(error);
+        }
+
+        public void SetNotFound(IEnumerable<string> errors)
+        {
+            _status = ServiceResponseStatus.NotFound;
+
+            foreach (var error in errors)
+                _errors.Add(error);
+        }
+
+        public void SetException()
+        {
+            _status = ServiceResponseStatus.Exception;
+        }
+
+        public void SetException(string error)
+        {
+            _status = ServiceResponseStatus.Exception;
+
+            _errors.Add(error);
+        }
+
+        public void SetException(IEnumerable<string> errors)
+        {
+            _status = ServiceResponseStatus.Exception;
+
+            foreach (var error in errors)
+                _errors.Add(error);
+        }
 
         public string[] GetErrors()
         {
@@ -31,17 +90,6 @@ namespace Api.Models
         public string GetErrorJson()
         {
             return JsonSerializer.Serialize(_errors);
-        }
-
-        public void AddError(string error)
-        {
-            _errors.Add(error);
-        }
-
-        public void AddErrors(IEnumerable<string> errors)
-        {
-            foreach (var error in errors)
-                _errors.Add(error);
         }
     }
 
