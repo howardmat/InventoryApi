@@ -17,10 +17,10 @@ namespace Api.Controllers
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Material;
 
-        private readonly CategoryService _categoryService;
+        private readonly CategoryRequestService _categoryService;
 
         public MaterialCategoryController(
-            CategoryService categoryService)
+            CategoryRequestService categoryService)
         {
             _categoryService = categoryService;
         }

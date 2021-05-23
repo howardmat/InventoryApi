@@ -11,12 +11,12 @@ namespace Api.Controllers
     [ApiController]
     public class CountryController : ControllerBase
     {
-        private readonly CountryService _countryService;
+        private readonly CountryRequestService _countryRequestService;
 
         public CountryController(
-            CountryService countryService)
+            CountryRequestService countryRequestService)
         {
-            _countryService = countryService;
+            _countryRequestService = countryRequestService;
         }
 
         // GET: api/<controller>
@@ -24,7 +24,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
         {
             // Get data from service
-            var result = await _countryService.ListAsync();
+            var result = await _countryRequestService.HandleGetAllAsync();
             return this.GetResultFromServiceResponse(result);
         }
     }

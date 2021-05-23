@@ -14,10 +14,10 @@ namespace Api.Controllers
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Product;
 
-        private readonly CategoryService _categoryService;
+        private readonly CategoryRequestService _categoryService;
 
         public ProductCategoryController(
-            CategoryService categoryService)
+            CategoryRequestService categoryService)
         {
             _categoryService = categoryService;
         }

@@ -62,8 +62,10 @@ namespace Api
         {
             services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
 
-            services.AddTransient<CategoryService>();
-            services.AddTransient<CountryService>();
+            services.AddTransient<CategoryEntityService>();
+            services.AddTransient<CategoryRequestService>();
+            services.AddTransient<CountryEntityService>();
+            services.AddTransient<CountryRequestService>();
             services.AddTransient<MaterialService>();
             services.AddTransient<ProvinceService>();
             services.AddTransient<TenantService>();

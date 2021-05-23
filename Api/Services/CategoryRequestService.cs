@@ -10,40 +10,26 @@ using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class CategoryService
+    public class CategoryRequestService
     {
-        private readonly ILogger<CategoryService> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly ILogger<CategoryRequestService> _logger;
+        private readonly CategoryEntityService _categoryEntityService;
 
-        public CategoryService(
-            ILogger<CategoryService> logger,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public CategoryRequestService(
+            ILogger<CategoryRequestService> logger,
+            CategoryEntityService categoryEntityService)
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _categoryEntityService = categoryEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> ListAsync(CategoryType categoryType)
+        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> HandleGetAllAsync(CategoryType categoryType)
         {
             var response = new ServiceResponse<IEnumerable<CategoryModel>>();
 
             try
             {
-                // Fetch data
-                var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType);
-
-                // Add to collection
-                var list = new List<CategoryModel>();
-                foreach (var item in data)
-                {
-                    list.Add(_mapper.Map<CategoryModel>(item));
-                }
-
-                // Set response
-                response.Data = list;
+                response.Data = await _categoryEntityService.ListAsync(categoryType);
             }
             catch (Exception ex)
             {
@@ -55,19 +41,16 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> GetAsync(int id)
+        public async Task<ServiceResponse<CategoryModel>> HandleGetByIdAsync(int id)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
-                // Fetch object
-                var category = await _unitOfWork.CategoryRepository.GetAsync(id);
-
-                // Set response
+                var category = await _categoryEntityService.GetModelOrDefaultAsync(id);
                 if (category != null)
                 {
-                    response.Data = _mapper.Map<CategoryModel>(category);
+                    response.Data = category;
                 }
                 else
                 {
@@ -90,25 +73,8 @@ namespace Api.Services
 
             try
             {
-                // Build and add the new object
-                var now = DateTime.UtcNow;
-                var category = new Category
-                {
-                    Name = model.Name,
-                    Type = categoryType,
-                    CreatedUserId = createdByUserId,
-                    CreatedUtc = now,
-                    LastModifiedUserId = createdByUserId,
-                    LastModifiedUtc = now
-                };
-                await _unitOfWork.CategoryRepository.AddAsync(category);
-
-                // Set response
-                if (await _unitOfWork.CompleteAsync() > 0)
-                {
-                    response.Data = _mapper.Map<CategoryModel>(category);
-                }
-                else
+                var newCategory = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId);
+                if (newCategory == null)
                 {
                     response.SetError($"An unexpected error occurred while saving the Category object");
                 }
@@ -130,16 +96,11 @@ namespace Api.Services
             try
             {
                 // Fetch the existing object
-                var category = await _unitOfWork.CategoryRepository.GetAsync(id);
+                var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
                 if (category != null)
                 {
-                    // Update entity
-                    category.Name = model.Name;
-                    category.LastModifiedUserId = modifiedByUserId;
-                    category.LastModifiedUtc = DateTime.UtcNow;
-
-                    // Set response
-                    if (!(await _unitOfWork.CompleteAsync() > 0))
+                    // Try to update and set response
+                    if (!await _categoryEntityService.UpdateAsync(category, model.Name, modifiedByUserId))
                     {
                         response.SetError($"An unexpected error occurred while saving the Category object");
                     }
