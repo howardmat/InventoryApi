@@ -8,7 +8,7 @@ namespace Data.Models
         [MaxLength(255)]
         public string CompanyName { get; set; }
         
-        public string OwnerUserId { get; set; }
+        public int OwnerUserId { get; set; }
         public virtual User OwnerUser { get; set; }
 
         public int PrimaryAddressId { get; set; }

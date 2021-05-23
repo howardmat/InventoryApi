@@ -4,6 +4,8 @@ namespace Api.Models
 {
     public class UserModel
     {
+        public int? Id { get; set; }
+
         [Required]
         [MaxLength(512)]
         public string Email { get; set; }

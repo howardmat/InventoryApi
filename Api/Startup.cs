@@ -1,4 +1,5 @@
 using Api.Models.MapProfiles;
+using Api.Services;
 using Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,6 +61,14 @@ namespace Api
         private void AddApplicationServices(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
+
+            services.AddTransient<CategoryService>();
+            services.AddTransient<CountryService>();
+            services.AddTransient<MaterialService>();
+            services.AddTransient<ProvinceService>();
+            services.AddTransient<TenantService>();
+            services.AddTransient<UnitOfMeasurementService>();
+            services.AddTransient<UserService>();
         }
 
         private void AddAutoMapperWithProfiles(IServiceCollection services)
