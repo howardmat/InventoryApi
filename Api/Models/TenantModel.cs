@@ -9,6 +9,7 @@ namespace Api.Models
         [MaxLength(255)]
         public string CompanyName { get; set; }
 
+        [Required]
         public AddressModel PrimaryAddress { get; set; }
     }
 }
