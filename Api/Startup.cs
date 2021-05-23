@@ -1,6 +1,8 @@
+using Api.Models.MapProfiles;
 using Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +21,11 @@ namespace Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<InventoryDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+
+            AddAutoMapperWithProfiles(services);
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -53,6 +60,19 @@ namespace Api
         private void AddApplicationServices(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
+        }
+
+        private void AddAutoMapperWithProfiles(IServiceCollection services)
+        {
+            services.AddAutoMapper(
+                typeof(AddressProfile),
+                typeof(CategoryProfile),
+                typeof(CountryProfile),
+                typeof(MaterialProfile),
+                typeof(ProvinceProfile),
+                typeof(TenantProfile),
+                typeof(UnitOfMeasurementProfile),
+                typeof(UserProfile));
         }
     }
 }
