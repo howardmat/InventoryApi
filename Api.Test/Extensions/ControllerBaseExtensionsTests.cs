@@ -53,5 +53,38 @@ namespace Api.Test.Extensions
 
             Assert.True(result.GetType() == typeof(CreatedResult), "Result should be 201 Created");
         }
+
+        [Fact]
+        public void Return_401NotFound()
+        {
+            var serviceResponse = new ServiceResponse<TestEntity>();
+            serviceResponse.SetNotFound();
+
+            var result = _controller.GetResultFromServiceResponse(serviceResponse);
+
+            Assert.True(result.GetType() == typeof(NotFoundObjectResult), "Result should be 401 Not Found");
+        }
+
+        [Fact]
+        public void Return_400BadRequest()
+        {
+            var serviceResponse = new ServiceResponse<TestEntity>();
+            serviceResponse.SetError();
+
+            var result = _controller.GetResultFromServiceResponse(serviceResponse);
+
+            Assert.True(result.GetType() == typeof(BadRequestObjectResult), "Result should be 400 Bad Request");
+        }
+
+        [Fact]
+        public void Return_500InternalServerError()
+        {
+            var serviceResponse = new ServiceResponse<TestEntity>();
+            serviceResponse.SetException();
+
+            var result = _controller.GetResultFromServiceResponse(serviceResponse);
+
+            Assert.True(((ObjectResult)result).StatusCode == 500, "Result should be 500 Internal Server Error");
+        }
     }
 }
