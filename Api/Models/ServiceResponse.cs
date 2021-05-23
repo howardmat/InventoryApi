@@ -14,16 +14,6 @@ namespace Api.Models
 
         public ServiceResponse() { }
 
-        public ServiceResponse(ICollection<string> errors)
-        {
-            _errors = errors;
-        }
-
-        public ServiceResponse(ServiceResponseStatus status)
-        {
-            _status = status;
-        }
-
         public ServiceResponse(ServiceResponseStatus status, ICollection<string> errors)
         {
             _status = status;
