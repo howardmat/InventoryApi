@@ -2,6 +2,8 @@
 using Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
+using System.Security.Claims;
 
 namespace Api.Extensions
 {
@@ -65,6 +67,15 @@ namespace Api.Extensions
             }
 
             return result;
+        }
+
+        public static int GetCurrentUserId(this ControllerBase controller, ClaimsPrincipal principal)
+        {
+            var userId = -1;
+
+            _ = int.TryParse(principal.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).FirstOrDefault(), out userId);
+            
+            return userId;
         }
     }
 }
