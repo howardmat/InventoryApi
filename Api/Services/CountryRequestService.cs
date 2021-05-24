@@ -29,7 +29,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("CountryService.ListAsync - exception:{@Exception}", ex);
+                _logger.LogError("CountryRequestService.ProcessListRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }

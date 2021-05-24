@@ -11,12 +11,12 @@ namespace Api.Controllers
     [ApiController]
     public class MaterialController : ControllerBase
     {
-        private readonly MaterialService _materialService;
+        private readonly MaterialRequestService _materialRequestService;
 
         public MaterialController(
-            MaterialService materialService)
+            MaterialRequestService materialRequestService)
         {
-            _materialService = materialService;
+            _materialRequestService = materialRequestService;
         }
 
         // GET: api/<controller>
@@ -24,7 +24,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<MaterialModel>>> Get()
         {
             // Get data from service
-            var result = await _materialService.ListAsync();
+            var result = await _materialRequestService.ProcessListRequestAsync();
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -33,7 +33,7 @@ namespace Api.Controllers
         public async Task<ActionResult<MaterialModel>> Get(int id)
         {
             // Get data from service
-            var result = await _materialService.GetAsync(id);
+            var result = await _materialRequestService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -45,7 +45,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            var result = await _materialService.CreateAsync(model, userId);
+            var result = await _materialRequestService.ProcessCreateRequestAsync(model, userId);
             return this.GetResultFromServiceResponse(result,
                 Url.Action("Get", "Material", new { id = result.Data?.Id }));
         }
@@ -58,7 +58,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _materialService.UpdateAsync(id, model, userId);
+            var result = await _materialRequestService.ProcessUpdateRequestAsync(id, model, userId);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -70,7 +70,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _materialService.DeleteAsync(id, userId);
+            var result = await _materialRequestService.ProcessDeleteRequestAsync(id, userId);
             return this.GetResultFromServiceResponse(result);
         }
     }

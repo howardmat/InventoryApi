@@ -1,11 +1,7 @@
 ﻿using Api.Models;
-using AutoMapper;
-using Data;
-using Data.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -48,12 +44,8 @@ namespace Api.Services
             try
             {
                 // Fetch object
-                var tenant = await _tenantEntityService.GetModelOrDefaultAsync(id);
-                if (tenant != null)
-                {
-                    response.Data = tenant;
-                }
-                else
+                response.Data = await _tenantEntityService.GetModelOrDefaultAsync(id);
+                if (response.Data == null)
                 {
                     response.SetNotFound($"Unable to locate Tenant object ({id})");
                 }
@@ -74,14 +66,10 @@ namespace Api.Services
 
             try
             {
-                var newTenant = await _tenantEntityService.CreateAsync(model, createdByUserId);
-                if (newTenant != null)
+                response.Data = await _tenantEntityService.CreateAsync(model, createdByUserId);
+                if (response.Data == null)
                 {
-                    response.Data = newTenant;
-                }
-                else
-                {
-                    response.SetError($"An unexpected error occurred while saving the Tenant object");
+                    response.SetError("An unexpected error occurred while saving the Tenant object");
                 }
             }
             catch (Exception ex)
@@ -101,26 +89,12 @@ namespace Api.Services
             try
             {
                 // Fetch the existing object
-                var tenant = await _unitOfWork.TenantRepository.GetAsync(id);
+                var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
                 if (tenant != null)
                 {
-                    // Update properties
-                    tenant.CompanyName = model.CompanyName;
-                    tenant.LastModifiedUserId = modifiedByUserId;
-                    tenant.LastModifiedUtc = DateTime.UtcNow;
-
-                    tenant.PrimaryAddress.City = model.PrimaryAddress.City;
-                    tenant.PrimaryAddress.CountryId = model.PrimaryAddress.Country.Id;
-                    tenant.PrimaryAddress.PostalCode = model.PrimaryAddress.PostalCode;
-                    tenant.PrimaryAddress.ProvinceId = model.PrimaryAddress.Province.Id;
-                    tenant.PrimaryAddress.StreetAddress = model.PrimaryAddress.StreetAddress;
-                    tenant.PrimaryAddress.LastModifiedUserId = modifiedByUserId;
-                    tenant.PrimaryAddress.LastModifiedUtc = DateTime.UtcNow;
-
-                    // Set response
-                    if (!(await _unitOfWork.CompleteAsync() > 0))
+                    if (!(await _tenantEntityService.UpdateAsync(tenant, model, modifiedByUserId)))
                     {
-                        response.SetError($"An unexpected error occurred while saving the Tenant object");
+                        response.SetError("An unexpected error occurred while saving the Tenant object");
                     }
                 }
                 else
@@ -145,16 +119,12 @@ namespace Api.Services
             try
             {
                 // Fetch the existing object
-                var tenant = await _unitOfWork.TenantRepository.GetAsync(id);
+                var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
                 if (tenant != null)
                 {
-                    tenant.DeletedUtc = DateTime.UtcNow;
-                    tenant.DeletedUserId = deletedByUserId;
-
-                    // Set response
-                    if (!(await _unitOfWork.CompleteAsync() > 0))
+                    if (!await _tenantEntityService.DeleteAsync(tenant, deletedByUserId))
                     {
-                        response.SetError($"An unexpected error occurred while removing the Tenant object");
+                        response.SetError("An unexpected error occurred while removing the Tenant object");
                     }
                 }
                 else

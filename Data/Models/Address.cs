@@ -41,5 +41,23 @@ namespace Data.Models
 
         public int CountryId { get; set; }
         public virtual Country Country { get; set; }
+
+        public void Update(
+            string street,
+            string city,
+            string postalCode,
+            int countryId,
+            int? provinceId = null,
+            int? modifyingUserId = null)
+        {
+            StreetAddress = street;
+            City = city;
+            PostalCode = postalCode;
+            CountryId = countryId;
+            ProvinceId = provinceId;
+
+            LastModifiedUserId = modifyingUserId;
+            LastModifiedUtc = DateTime.UtcNow;
+        }
     }
 }

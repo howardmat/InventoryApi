@@ -2,9 +2,6 @@
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
@@ -13,12 +10,12 @@ namespace Api.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly UserRequestService _userRequestService;
 
         public UserController(
-            UserService userService)
+            UserRequestService userRequestService)
         {
-            _userService = userService;
+            _userRequestService = userRequestService;
         }
 
         // GET api/<controller>/id
@@ -26,23 +23,21 @@ namespace Api.Controllers
         public async Task<ActionResult<UserModel>> Get(int id)
         {
             // Get data from service
-            var result = await _userService.GetAsync(id);
+            var result = await _userRequestService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
 
         // POST api/<controller>
         [HttpPost]
-        public async Task<ActionResult<UserModel>> Post()
+        public async Task<ActionResult<UserModel>> Post(UserModel model)
         {
             // Get current user id
-            //var model = this.GetModelFromClaimsPrincipal(User);
+            var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            //var result = await _userService.CreateOrUpdateAsync(model, model.B2cAccountId);
-            //return this.GetResultFromServiceResponse(result,
-            //    Url.Action("Get", "User", new { id = result.Data?.B2cAccountId }));
-
-            return this.GetResultFromServiceResponse(null);
+            var result = await _userRequestService.ProcessCreateRequestAsync(model, userId);
+            return this.GetResultFromServiceResponse(result,
+                Url.Action("Get", "User", new { id = result.Data?.Id }));
         }
     }
 }

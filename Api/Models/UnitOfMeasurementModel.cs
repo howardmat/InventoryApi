@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Models
 {
@@ -13,5 +14,11 @@ namespace Api.Models
         [Required]
         [MaxLength(10)]
         public string Abbreviation { get; set; }
+
+        [Required]
+        public MeasurementSystem System { get; set; }
+
+        [Required]
+        public MeasurementType Type { get; set; }
     }
 }

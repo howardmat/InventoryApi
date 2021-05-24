@@ -84,7 +84,7 @@ namespace Api.Services
             };
             await _unitOfWork.TenantRepository.AddAsync(tenant);
 
-            // Set response
+            // Save data
             if (await _unitOfWork.CompleteAsync() > 0)
             {
                 tenant = await _unitOfWork.TenantRepository.GetAsync(tenant.Id);
@@ -95,27 +95,48 @@ namespace Api.Services
             return newModel;
         }
 
-        public async Task<bool> UpdateAsync(Tenant Tenant, string name, int modifyingUserId)
+        public async Task<bool> UpdateAsync(Tenant tenant, TenantModel model, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 
-            // Update entity
-            Tenant.Name = name;
-            Tenant.LastModifiedUserId = modifyingUserId;
-            Tenant.LastModifiedUtc = now;
+            // Update properties
+            tenant.CompanyName = model.CompanyName;
+            tenant.LastModifiedUserId = modifyingUserId;
+            tenant.LastModifiedUtc = now;
+
+            if (tenant.PrimaryAddress == null)
+            {
+                tenant.PrimaryAddress = new Address(
+                    model.PrimaryAddress.StreetAddress,
+                    model.PrimaryAddress.City,
+                    model.PrimaryAddress.PostalCode,
+                    model.PrimaryAddress.CountryId.Value,
+                    model.PrimaryAddress.ProvinceId,
+                    modifyingUserId);
+            }
+            else
+            {
+                tenant.PrimaryAddress.Update(
+                    model.PrimaryAddress.StreetAddress, 
+                    model.PrimaryAddress.City,
+                    model.PrimaryAddress.PostalCode,
+                    model.PrimaryAddress.CountryId.Value,
+                    model.PrimaryAddress.ProvinceId,
+                    modifyingUserId);
+            }            
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 
             return success;
         }
 
-        public async Task<bool> DeleteAsync(Tenant Tenant, int modifyingUserId)
+        public async Task<bool> DeleteAsync(Tenant tenant, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 
             // Update entity
-            Tenant.DeletedUserId = modifyingUserId;
-            Tenant.DeletedUtc = now;
+            tenant.DeletedUserId = modifyingUserId;
+            tenant.DeletedUtc = now;
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

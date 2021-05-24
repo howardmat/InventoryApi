@@ -1,11 +1,7 @@
 ﻿using Api.Models;
-using AutoMapper;
-using Data;
-using Data.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -47,12 +43,8 @@ namespace Api.Services
 
             try
             {
-                var model = await _materialEntityService.GetModelOrDefaultAsync(id);
-                if (model != null)
-                {
-                    response.Data = model;
-                }
-                else
+                response.Data = await _materialEntityService.GetModelOrDefaultAsync(id);
+                if (response.Data == null)
                 {
                     response.SetNotFound($"Unable to locate Material object ({id})");
                 }
@@ -73,12 +65,8 @@ namespace Api.Services
 
             try
             {
-                var newMaterial = await _materialEntityService.CreateAsync(model, createdByUserId);
-                if (newMaterial != null)
-                {
-                    response.Data = newMaterial;
-                }
-                else
+                response.Data = await _materialEntityService.CreateAsync(model, createdByUserId);
+                if (response.Data == null)
                 {
                     response.SetError("An unexpected error occurred while saving the Material object");
                 }
@@ -105,7 +93,7 @@ namespace Api.Services
                 {
                     if (!await _materialEntityService.UpdateAsync(material, model, modifiedByUserId))
                     {
-                        response.SetError($"An unexpected error occurred while saving the Material object");
+                        response.SetError("An unexpected error occurred while saving the Material object");
                     }
                 }
                 else
@@ -135,7 +123,7 @@ namespace Api.Services
                 {
                     if (!await _materialEntityService.DeleteAsync(material, deletedByUserId))
                     {
-                        response.SetError($"An unexpected error occurred while removing the Material object");
+                        response.SetError("An unexpected error occurred while removing the Material object");
                     }
                 }
                 else

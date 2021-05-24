@@ -11,17 +11,14 @@ namespace Api.Services
     public class ProvinceRequestService
     {
         private readonly ILogger<ProvinceRequestService> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly ProvinceEntityService _provinceEntityService;
 
         public ProvinceRequestService(
             ILogger<ProvinceRequestService> logger,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+            ProvinceEntityService provinceEntityService)
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _provinceEntityService = provinceEntityService;
         }
 
         public async Task<ServiceResponse<IEnumerable<ProvinceModel>>> ProcessListRequestAsync(int countryId)
@@ -30,18 +27,7 @@ namespace Api.Services
 
             try
             {
-                // Fetch data
-                var data = await _unitOfWork.ProvinceRepository.ListAsync(countryId);
-
-                // Add to collection
-                var list = new List<ProvinceModel>();
-                foreach (var item in data)
-                {
-                    list.Add(_mapper.Map<ProvinceModel>(item));
-                }
-
-                // Set response
-                response.Data = list;
+                response.Data = await _provinceEntityService.ListAsync(countryId);
             }
             catch (Exception ex)
             {

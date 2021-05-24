@@ -11,10 +11,10 @@ namespace Api.Controllers
     [ApiController]
     public class UnitOfMeasurementController : ControllerBase
     {
-        private readonly UnitOfMeasurementService _unitOfMeasurementService;
+        private readonly UnitOfMeasurementRequestService _unitOfMeasurementService;
 
         public UnitOfMeasurementController(
-            UnitOfMeasurementService unitOfMeasurementService)
+            UnitOfMeasurementRequestService unitOfMeasurementService)
         {
             _unitOfMeasurementService = unitOfMeasurementService;
         }
@@ -24,7 +24,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
         {
             // Get data from service
-            var result = await _unitOfMeasurementService.ListAsync();
+            var result = await _unitOfMeasurementService.ProcessListRequestAsync();
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -33,7 +33,7 @@ namespace Api.Controllers
         public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
         {
             // Get data from service
-            var result = await _unitOfMeasurementService.GetAsync(id);
+            var result = await _unitOfMeasurementService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
     }

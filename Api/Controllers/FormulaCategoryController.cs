@@ -27,7 +27,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
             // Get data from service
-            var result = await _categoryService.ListAsync(CATEGORY_TYPE);
+            var result = await _categoryService.ProcessListRequestAsync(CATEGORY_TYPE);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -36,7 +36,7 @@ namespace Api.Controllers
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
             // Get data from service
-            var result = await _categoryService.GetAsync(id);
+            var result = await _categoryService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -48,7 +48,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            var result = await _categoryService.CreateAsync(model, CATEGORY_TYPE, userId);
+            var result = await _categoryService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId);
             return this.GetResultFromServiceResponse(result,
                 Url.Action("Get", "FormulaCategory", new { id = result.Data?.Id }));
         }
@@ -61,7 +61,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _categoryService.UpdateAsync(id, model, userId);
+            var result = await _categoryService.ProcessUpdateRequestAsync(id, model, userId);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -73,7 +73,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _categoryService.DeleteAsync(id, userId);
+            var result = await _categoryService.ProcessDeleteRequestAsync(id, userId);
             return this.GetResultFromServiceResponse(result);
         }
     }

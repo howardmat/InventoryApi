@@ -1,10 +1,10 @@
 ﻿using Api.Extensions;
 using Api.Models;
 using Api.Services;
+using Data.Enums;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Data.Enums;
 
 namespace Api.Controllers
 {
@@ -14,12 +14,12 @@ namespace Api.Controllers
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Product;
 
-        private readonly CategoryRequestService _categoryService;
+        private readonly CategoryRequestService _categoryRequestService;
 
         public ProductCategoryController(
-            CategoryRequestService categoryService)
+            CategoryRequestService categoryRequestService)
         {
-            _categoryService = categoryService;
+            _categoryRequestService = categoryRequestService;
         }
 
         // GET: api/<controller>
@@ -27,7 +27,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
             // Get data from service
-            var result = await _categoryService.ListAsync(CATEGORY_TYPE);
+            var result = await _categoryRequestService.ProcessListRequestAsync(CATEGORY_TYPE);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -36,7 +36,7 @@ namespace Api.Controllers
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
             // Get data from service
-            var result = await _categoryService.GetAsync(id);
+            var result = await _categoryRequestService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -48,7 +48,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            var result = await _categoryService.CreateAsync(model, CATEGORY_TYPE, userId);
+            var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId);
             return this.GetResultFromServiceResponse(result,
                 Url.Action("Get", "ProductCategory", new { id = result.Data?.Id }));
         }
@@ -61,7 +61,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _categoryService.UpdateAsync(id, model, userId);
+            var result = await _categoryRequestService.ProcessUpdateRequestAsync(id, model, userId);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -73,7 +73,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Update existing record
-            var result = await _categoryService.DeleteAsync(id, userId);
+            var result = await _categoryRequestService.ProcessDeleteRequestAsync(id, userId);
             return this.GetResultFromServiceResponse(result);
         }
     }

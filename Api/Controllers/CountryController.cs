@@ -24,7 +24,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
         {
             // Get data from service
-            var serviceResponse = await _countryRequestService.GetResponseForListRequestAsync();
+            var serviceResponse = await _countryRequestService.ProcessListRequestAsync();
             return this.GetResultFromServiceResponse(serviceResponse);
         }
     }

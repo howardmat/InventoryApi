@@ -44,12 +44,8 @@ namespace Api.Services
 
             try
             {
-                var category = await _categoryEntityService.GetModelOrDefaultAsync(id);
-                if (category != null)
-                {
-                    response.Data = category;
-                }
-                else
+                response.Data = await _categoryEntityService.GetModelOrDefaultAsync(id);
+                if (response.Data == null)
                 {
                     response.SetNotFound($"Unable to locate Category object ({id})");
                 }
@@ -70,14 +66,10 @@ namespace Api.Services
 
             try
             {
-                var newCategory = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId);
-                if (newCategory != null)
+                response.Data = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId);
+                if (response.Data == null)
                 {
-                    response.Data = newCategory;
-                }
-                else
-                {
-                    response.SetError($"An unexpected error occurred while saving the Category object");
+                    response.SetError("An unexpected error occurred while saving the Category object");
                 }
             }
             catch (Exception ex)
@@ -103,7 +95,7 @@ namespace Api.Services
                     // Try to update and set response
                     if (!await _categoryEntityService.UpdateAsync(category, model.Name, modifiedByUserId))
                     {
-                        response.SetError($"An unexpected error occurred while saving the Category object");
+                        response.SetError("An unexpected error occurred while saving the Category object");
                     }
                 }
                 else
@@ -134,7 +126,7 @@ namespace Api.Services
                     // Try to update and set response
                     if (!await _categoryEntityService.DeleteAsync(category, deletedByUserId))
                     {
-                        response.SetError($"An unexpected error occurred while removing the Category object");
+                        response.SetError("An unexpected error occurred while removing the Category object");
                     }
                 }
                 else
