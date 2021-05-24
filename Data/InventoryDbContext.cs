@@ -30,7 +30,37 @@ namespace Data
             base.OnModelCreating(builder);
 
             #region Model Configuration
-            
+            builder.Entity<FormulaIngredient>(e =>
+            {
+                e.HasOne(u => u.Material)
+                    .WithMany()
+                    .HasForeignKey(u => u.MaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Material>(e =>
+            {
+                e.HasOne(u => u.Tenant)
+                    .WithMany()
+                    .HasForeignKey(u => u.TenantId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Tenant>(e =>
+            {
+                e.HasOne(u => u.OwnerUser)
+                    .WithMany()
+                    .HasForeignKey(u => u.OwnerUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<User>(e =>
+            {
+                e.HasOne(u => u.Tenant)
+                    .WithMany(t => t.Users)
+                    .HasForeignKey(u => u.TenantId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
             #endregion
 
             #region Seed Data

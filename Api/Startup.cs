@@ -1,32 +1,53 @@
 using Api.Models.MapProfiles;
 using Api.Services;
 using Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 namespace Api
 {
     public class Startup
     {
+        private IConfiguration _configuration;
+        private string _firebaseProjectId;
+        private string _secureTokenUrl;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
+            _firebaseProjectId = _configuration["Firebase:ProjectId"];
+            _secureTokenUrl = $"https://securetoken.google.com/{_firebaseProjectId}";
         }
-
-        public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<InventoryDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    _configuration.GetConnectionString("DefaultConnection")));
 
             AddAutoMapperWithProfiles(services);
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = _secureTokenUrl;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = _secureTokenUrl,
+                        ValidateAudience = true,
+                        ValidAudience = _firebaseProjectId,
+                        ValidateLifetime = true
+                    };
+                });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -49,6 +70,8 @@ namespace Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
