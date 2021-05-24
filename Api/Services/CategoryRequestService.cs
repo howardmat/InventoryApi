@@ -1,8 +1,5 @@
 ﻿using Api.Models;
-using AutoMapper;
-using Data;
 using Data.Enums;
-using Data.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -23,7 +20,7 @@ namespace Api.Services
             _categoryEntityService = categoryEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> HandleGetAllAsync(CategoryType categoryType)
+        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> ProcessListRequestAsync(CategoryType categoryType)
         {
             var response = new ServiceResponse<IEnumerable<CategoryModel>>();
 
@@ -33,7 +30,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("CategoryService.ListAsync - exception:{@Exception}", ex);
+                _logger.LogError("CategoryRequestService.GetResponseForGetRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -41,7 +38,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> HandleGetByIdAsync(int id)
+        public async Task<ServiceResponse<CategoryModel>> ProcessGetRequestAsync(int id)
         {
             var response = new ServiceResponse<CategoryModel>();
 
@@ -59,7 +56,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("CategoryService.GetAsync - exception:{@Exception}", ex);
+                _logger.LogError("CategoryRequestService.GetResponseForGetRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -67,21 +64,25 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> CreateAsync(CategoryModel model, CategoryType categoryType, int createdByUserId)
+        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryModel model, CategoryType categoryType, int createdByUserId)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
                 var newCategory = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId);
-                if (newCategory == null)
+                if (newCategory != null)
+                {
+                    response.Data = newCategory;
+                }
+                else
                 {
                     response.SetError($"An unexpected error occurred while saving the Category object");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError("CategoryService.CreateAsync - exception:{@Exception}", ex);
+                _logger.LogError("CategoryRequestService.GetResponseForCreateRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -89,7 +90,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> UpdateAsync(int id, CategoryModel model, int modifiedByUserId)
+        public async Task<ServiceResponse> ProcessUpdateRequestAsync(int id, CategoryModel model, int modifiedByUserId)
         {
             var response = new ServiceResponse();
 
@@ -112,7 +113,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("CategoryService.UpdateAsync - exception:{@Exception}", ex);
+                _logger.LogError("CategoryRequestService.GetResponseForUpdateRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -120,21 +121,18 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> DeleteAsync(int id, int deletedByUserId)
+        public async Task<ServiceResponse> ProcessDeleteRequestAsync(int id, int deletedByUserId)
         {
             var response = new ServiceResponse();
 
             try
             {
                 // Fetch the existing object
-                var category = await _unitOfWork.CategoryRepository.GetAsync(id);
+                var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
                 if (category != null)
                 {
-                    category.DeletedUtc = DateTime.UtcNow;
-                    category.DeletedUserId = deletedByUserId;
-
-                    // Set response
-                    if (!(await _unitOfWork.CompleteAsync() > 0))
+                    // Try to update and set response
+                    if (!await _categoryEntityService.DeleteAsync(category, deletedByUserId))
                     {
                         response.SetError($"An unexpected error occurred while removing the Category object");
                     }
@@ -146,7 +144,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("CategoryService.DeleteAsync - exception:{@Exception}", ex);
+                _logger.LogError("CategoryRequestService.GetResponseForDeleteRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }

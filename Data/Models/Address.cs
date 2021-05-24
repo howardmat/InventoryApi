@@ -1,9 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models
 {
     public class Address : InventoryBaseModel
     {
+        public Address() { }
+
+        public Address(
+            string streetAddress,
+            string city,
+            string postalCode,
+            int countryId,
+            int? provinceId = null,
+            int? modifyingUserId = null)
+        {
+            StreetAddress = streetAddress;
+            City = city;
+            PostalCode = postalCode;
+            ProvinceId = provinceId;
+            CountryId = countryId;
+
+            var now = DateTime.Now;
+            CreatedUserId = modifyingUserId;
+            LastModifiedUserId = modifyingUserId;
+            CreatedUtc = now;
+            LastModifiedUtc = now;
+        }
+
         public string StreetAddress { get; set; }
 
         [MaxLength(255)]

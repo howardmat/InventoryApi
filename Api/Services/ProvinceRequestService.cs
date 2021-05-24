@@ -4,19 +4,18 @@ using Data;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class ProvinceService
+    public class ProvinceRequestService
     {
-        private readonly ILogger<ProvinceService> _logger;
+        private readonly ILogger<ProvinceRequestService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public ProvinceService(
-            ILogger<ProvinceService> logger,
+        public ProvinceRequestService(
+            ILogger<ProvinceRequestService> logger,
             IUnitOfWork unitOfWork,
             IMapper mapper)
         {
@@ -25,7 +24,7 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<IEnumerable<ProvinceModel>>> ListAsync(int countryId)
+        public async Task<ServiceResponse<IEnumerable<ProvinceModel>>> ProcessListRequestAsync(int countryId)
         {
             var response = new ServiceResponse<IEnumerable<ProvinceModel>>();
 
@@ -46,7 +45,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("ProvinceService.ListAsync - exception:{@Exception}", ex);
+                _logger.LogError("ProvinceRequestService.ProcessListRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }

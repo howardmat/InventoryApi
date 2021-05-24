@@ -11,10 +11,10 @@ namespace Api.Controllers
     [ApiController]
     public class ProvinceController : ControllerBase
     {
-        private readonly ProvinceService _provinceService;
+        private readonly ProvinceRequestService _provinceService;
 
         public ProvinceController(
-            ProvinceService provinceService)
+            ProvinceRequestService provinceService)
         {
             _provinceService = provinceService;
         }

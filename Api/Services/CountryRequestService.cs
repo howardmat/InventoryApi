@@ -19,7 +19,7 @@ namespace Api.Services
             _countryEntityService = countryEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CountryModel>>> HandleGetAllAsync()
+        public async Task<ServiceResponse<IEnumerable<CountryModel>>> ProcessListRequestAsync()
         {
             var response = new ServiceResponse<IEnumerable<CountryModel>>();
 

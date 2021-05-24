@@ -66,9 +66,12 @@ namespace Api
             services.AddTransient<CategoryRequestService>();
             services.AddTransient<CountryEntityService>();
             services.AddTransient<CountryRequestService>();
-            services.AddTransient<MaterialService>();
-            services.AddTransient<ProvinceService>();
-            services.AddTransient<TenantService>();
+            services.AddTransient<MaterialEntityService>();
+            services.AddTransient<MaterialRequestService>();
+            services.AddTransient<ProvinceEntityService>();
+            services.AddTransient<ProvinceRequestService>();
+            services.AddTransient<TenantEntityService>();
+            services.AddTransient<TenantRequestService>();
             services.AddTransient<UnitOfMeasurementService>();
             services.AddTransient<UserService>();
         }

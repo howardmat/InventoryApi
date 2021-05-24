@@ -10,12 +10,12 @@ namespace Api.Controllers
     [ApiController]
     public class TenantController : ControllerBase
     {
-        private readonly TenantService _tenantService;
+        private readonly TenantRequestService _tenantRequestService;
 
         public TenantController(
-            TenantService tenantService)
+            TenantRequestService tenantRequestService)
         {
-            _tenantService = tenantService;
+            _tenantRequestService = tenantRequestService;
         }
 
         // GET api/<controller>/5
@@ -23,7 +23,7 @@ namespace Api.Controllers
         public async Task<ActionResult<TenantModel>> Get(int id)
         {
             // Get data from service
-            var result = await _tenantService.GetAsync(id);
+            var result = await _tenantRequestService.ProcessGetRequestAsync(id);
             return this.GetResultFromServiceResponse(result);
         }
 
@@ -35,7 +35,7 @@ namespace Api.Controllers
             var userId = this.GetCurrentUserId(User);
 
             // Create new record
-            var result = await _tenantService.CreateAsync(model, userId);
+            var result = await _tenantRequestService.ProcessCreateRequestAsync(model, userId);
             return this.GetResultFromServiceResponse(result,
                 Url.Action("Get", "Tenant", new { id = result.Data?.Id }));
         }

@@ -10,44 +10,30 @@ using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class TenantService
+    public class TenantRequestService
     {
-        private readonly ILogger<TenantService> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        private readonly ILogger<TenantRequestService> _logger;
+        private readonly TenantEntityService _tenantEntityService;
 
-        public TenantService(
-            ILogger<TenantService> logger,
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+        public TenantRequestService(
+            ILogger<TenantRequestService> logger,
+            TenantEntityService tenantEntityService)
         {
             _logger = logger;
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            _tenantEntityService = tenantEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<TenantModel>>> ListAsync()
+        public async Task<ServiceResponse<IEnumerable<TenantModel>>> ProcessListRequestAsync()
         {
             var response = new ServiceResponse<IEnumerable<TenantModel>>();
 
             try
             {
-                // Fetch data
-                var data = await _unitOfWork.TenantRepository.ListAsync();
-
-                // Add to collection
-                var list = new List<TenantModel>();
-                foreach (var item in data)
-                {
-                    list.Add(_mapper.Map<TenantModel>(item));
-                }
-
-                // Set response
-                response.Data = list;
+                response.Data = await _tenantEntityService.ListAsync();
             }
             catch (Exception ex)
             {
-                _logger.LogError("TenantService.ListAsync - exception:{@Exception}", ex);
+                _logger.LogError("TenantRequestService.ProcessListRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -55,19 +41,17 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<TenantModel>> GetAsync(int id)
+        public async Task<ServiceResponse<TenantModel>> ProcessGetRequestAsync(int id)
         {
             var response = new ServiceResponse<TenantModel>();
 
             try
             {
                 // Fetch object
-                var tenant = await _unitOfWork.TenantRepository.GetAsync(id);
-
-                // Set response
+                var tenant = await _tenantEntityService.GetModelOrDefaultAsync(id);
                 if (tenant != null)
                 {
-                    response.Data = _mapper.Map<TenantModel>(tenant);
+                    response.Data = tenant;
                 }
                 else
                 {
@@ -76,7 +60,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("TenantService.ListAsync - exception:{@Exception}", ex);
+                _logger.LogError("TenantRequestService.ProcessGetRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -84,64 +68,25 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<TenantModel>> CreateAsync(TenantModel model, int createdByUserId)
+        public async Task<ServiceResponse<TenantModel>> ProcessCreateRequestAsync(TenantModel model, int createdByUserId)
         {
             var response = new ServiceResponse<TenantModel>();
 
             try
             {
-                var now = DateTime.UtcNow;
-
-                // Build and add the new object
-                var tenant = new Tenant
+                var newTenant = await _tenantEntityService.CreateAsync(model, createdByUserId);
+                if (newTenant != null)
                 {
-                    CompanyName = model.CompanyName,
-                    OwnerUserId = createdByUserId,
-                    PrimaryAddress = new Address
-                    {
-                        City = model.PrimaryAddress.City,
-                        CountryId = model.PrimaryAddress.Country.Id,
-                        PostalCode = model.PrimaryAddress.PostalCode,
-                        ProvinceId = model.PrimaryAddress.Province.Id,
-                        StreetAddress = model.PrimaryAddress.StreetAddress,
-                        CreatedUserId = createdByUserId,
-                        LastModifiedUserId = createdByUserId,
-                        CreatedUtc = now,
-                        LastModifiedUtc = now
-                    },
-                    CreatedUserId = createdByUserId,
-                    LastModifiedUserId = createdByUserId,
-                    CreatedUtc = now,
-                    LastModifiedUtc = now
-                };
-                await _unitOfWork.TenantRepository.AddAsync(tenant);
-
-                // Get the current user and set their tenant Id
-                var user = await _unitOfWork.UserRepository.FindByIdAsync(createdByUserId);
-                if (user != null)
-                {
-                    user.Tenant = tenant;
-
-                    // Set response
-                    if (await _unitOfWork.CompleteAsync() > 0)
-                    {
-                        tenant = await _unitOfWork.TenantRepository.GetAsync(tenant.Id);
-
-                        response.Data = _mapper.Map<TenantModel>(tenant);
-                    }
-                    else
-                    {
-                        response.SetError($"An unexpected error occurred while saving the Tenant object");
-                    }
+                    response.Data = newTenant;
                 }
                 else
                 {
-                    response.SetError($"Unable to locate the User. Failed to create the Tenant object");
+                    response.SetError($"An unexpected error occurred while saving the Tenant object");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError("TenantService.CreateAsync - exception:{@Exception}", ex);
+                _logger.LogError("TenantRequestService.ProcessCreateRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -149,7 +94,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> UpdateAsync(int id, TenantModel model, int modifiedByUserId)
+        public async Task<ServiceResponse> ProcessUpdateRequestAsync(int id, TenantModel model, int modifiedByUserId)
         {
             var response = new ServiceResponse();
 
@@ -185,7 +130,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("TenantService.UpdateAsync - exception:{@Exception}", ex);
+                _logger.LogError("TenantRequestService.ProcessUpdateRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }
@@ -193,7 +138,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> DeleteAsync(int id, int deletedByUserId)
+        public async Task<ServiceResponse> ProcessDeleteRequestAsync(int id, int deletedByUserId)
         {
             var response = new ServiceResponse();
 
@@ -219,7 +164,7 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError("TenantService.DeleteAsync - exception:{@Exception}", ex);
+                _logger.LogError("TenantRequestService.ProcessDeleteRequestAsync - exception:{@Exception}", ex);
 
                 response.SetException();
             }

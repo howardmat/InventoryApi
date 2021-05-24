@@ -5,7 +5,6 @@ using Data.Enums;
 using Data.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -95,6 +94,19 @@ namespace Api.Services
             category.Name = name;
             category.LastModifiedUserId = modifyingUserId;
             category.LastModifiedUtc = now;
+
+            var success = await _unitOfWork.CompleteAsync() > 0;
+
+            return success;
+        }
+
+        public async Task<bool> DeleteAsync(Category category, int modifyingUserId)
+        {
+            var now = DateTime.UtcNow;
+
+            // Update entity
+            category.DeletedUserId = modifyingUserId;
+            category.DeletedUtc = now;
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 
