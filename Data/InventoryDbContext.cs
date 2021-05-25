@@ -46,6 +46,16 @@ namespace Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<Province>(e =>
+            {
+                e.HasKey(p => new { p.IsoCode, p.CountryIsoCode });
+
+                e.HasOne(p => p.Country)
+                    .WithMany()
+                    .HasForeignKey(u => u.CountryIsoCode)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<Tenant>(e =>
             {
                 e.HasOne(u => u.OwnerUser)

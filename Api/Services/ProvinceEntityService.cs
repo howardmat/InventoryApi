@@ -19,10 +19,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProvinceModel>> ListAsync(int countryId)
+        public async Task<IEnumerable<ProvinceModel>> ListAsync(string countryCode)
         {
             // Fetch data
-            var data = await _unitOfWork.ProvinceRepository.ListAsync(countryId);
+            var data = await _unitOfWork.ProvinceRepository.ListAsync(countryCode);
 
             // Add to collection
             var list = new List<ProvinceModel>();

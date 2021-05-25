@@ -2,13 +2,15 @@
 
 namespace Data.Models
 {
-    public class Country : InventoryBaseModel
+    public class Country
     {
-        [MaxLength(255)]
+        [MaxLength(2)]
+        [Key]
+        public string IsoCode { get; set; }
+
+        [MaxLength(1000)]
         public string Name { get; set; }
 
-        [MaxLength(2)]
-        public string IsoCode { get; set; }
         public int DisplayOrder { get; set; }
     }
 }

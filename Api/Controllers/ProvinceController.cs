@@ -23,10 +23,10 @@ namespace Api.Controllers
 
         // GET: api/<controller>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProvinceModel>>> Get(int countryId)
+        public async Task<ActionResult<IEnumerable<ProvinceModel>>> Get(string countryCode)
         {
             // Get data from service
-            var result = await _provinceService.ProcessListRequestAsync(countryId);
+            var result = await _provinceService.ProcessListRequestAsync(countryCode);
             return this.GetResultFromServiceResponse(result);
         }
     }

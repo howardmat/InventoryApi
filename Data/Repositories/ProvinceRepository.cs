@@ -11,11 +11,10 @@ namespace Data.Repositories
         public InventoryDbContext _context => Context as InventoryDbContext;
         public ProvinceRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Province>> ListAsync(int countryId)
+        public async Task<IEnumerable<Province>> ListAsync(string countryCode)
         {
             return await (from p in _context.Province
-                          where !p.DeletedUtc.HasValue
-                            && p.CountryId == countryId
+                          where p.CountryIsoCode.ToLower() == countryCode.ToLower()
                           orderby p.DisplayOrder, p.Name
                           select p)
                         .ToListAsync();

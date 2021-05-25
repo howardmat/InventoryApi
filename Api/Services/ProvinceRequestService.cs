@@ -21,13 +21,13 @@ namespace Api.Services
             _provinceEntityService = provinceEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<ProvinceModel>>> ProcessListRequestAsync(int countryId)
+        public async Task<ServiceResponse<IEnumerable<ProvinceModel>>> ProcessListRequestAsync(string countryCode)
         {
             var response = new ServiceResponse<IEnumerable<ProvinceModel>>();
 
             try
             {
-                response.Data = await _provinceEntityService.ListAsync(countryId);
+                response.Data = await _provinceEntityService.ListAsync(countryCode);
             }
             catch (Exception ex)
             {

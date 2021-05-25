@@ -2,15 +2,18 @@
 
 namespace Data.Models
 {
-    public class Province : InventoryBaseModel
+    public class Province
     {
-        public int CountryId { get; set; }
-
-        [MaxLength(255)]
-        public string Name { get; set; }
+        [MaxLength(2)]
+        [Key]
+        public string IsoCode { get; set; }
 
         [MaxLength(2)]
-        public string IsoCode { get; set; }
+        public string CountryIsoCode { get; set; }
+
+        [MaxLength(1000)]
+        public string Name { get; set; }
+
         public int DisplayOrder { get; set; }
 
         public virtual Country Country { get; set; }

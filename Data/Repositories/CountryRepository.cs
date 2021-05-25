@@ -14,7 +14,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<Country>> ListAsync()
         {
             return await (from c in _context.Country
-                          where !c.DeletedUtc.HasValue
                           orderby c.DisplayOrder, c.Name
                           select c)
                         .ToListAsync();
