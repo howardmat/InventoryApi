@@ -7,6 +7,10 @@ namespace Api.Models
         public int? Id { get; set; }
 
         [Required]
+        [MaxLength(1024)]
+        public string LocalId { get; set; }
+
+        [Required]
         [MaxLength(512)]
         public string Email { get; set; }
 
@@ -18,7 +22,6 @@ namespace Api.Models
         [MaxLength(256)]
         public string LastName { get; set; }
 
-        [Required]
         public int? TenantId { get; set; }
     }
 }

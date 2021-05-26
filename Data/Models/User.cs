@@ -4,6 +4,9 @@ namespace Data.Models
 {
     public class User : InventoryBaseModel
     {
+        [MaxLength(1024)]
+        public string LocalId { get; set; }
+
         [MaxLength(512)]
         public string Email { get; set; }
 

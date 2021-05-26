@@ -58,7 +58,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<UserModel> CreateAsync(string email, int modifyingUserId)
+        public async Task<UserModel> CreateAsync(string localId, string email, string firstName, string lastName, int modifyingUserId)
         {
             UserModel model = null;
 
@@ -67,6 +67,9 @@ namespace Api.Services
             // Build and add the new object
             var user = new User
             {
+                LocalId = localId,
+                FirstName = firstName,
+                LastName = lastName,
                 Email = email,
                 CreatedUserId = modifyingUserId,
                 CreatedUtc = now,
@@ -84,12 +87,14 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<bool> UpdateAsync(User user, string email, int modifyingUserId)
+        public async Task<bool> UpdateAsync(User user, UserModel userModel, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 
             // Update entity
-            user.Email = email;
+            user.Email = userModel.Email;
+            user.FirstName = userModel.FirstName;
+            user.LastName = userModel.LastName;
             user.LastModifiedUserId = modifyingUserId;
             user.LastModifiedUtc = now;
 

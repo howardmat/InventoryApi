@@ -47,7 +47,7 @@ namespace Api.Services
 
             try
             {
-                response.Data = await _userEntityService.CreateAsync(model.Email, modifyingUserId);
+                response.Data = await _userEntityService.CreateAsync(model.LocalId, model.Email, model.FirstName, model.LastName, modifyingUserId);
                 if (response.Data == null)
                 {
                     response.SetError("An unexpected error occurred while saving the User object");
