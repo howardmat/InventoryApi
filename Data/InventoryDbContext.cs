@@ -32,6 +32,7 @@ namespace Data
             #region Model Configuration
             builder.Entity<FormulaIngredient>(e =>
             {
+                e.Property(f => f.Quantity).HasPrecision(19, 4);
                 e.HasOne(u => u.Material)
                     .WithMany()
                     .HasForeignKey(u => u.MaterialId)
@@ -44,6 +45,22 @@ namespace Data
                     .WithMany()
                     .HasForeignKey(u => u.TenantId)
                     .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<MaterialInventoryTransaction>(e => 
+            {
+                e.Property(f => f.AmountPaid).HasPrecision(19, 4);
+                e.Property(f => f.Quantity).HasPrecision(19, 4);
+            });
+
+            builder.Entity<Product>(e =>
+            {
+                e.Property(f => f.Price).HasPrecision(19, 4);
+            });
+
+            builder.Entity<ProductInventoryTransaction>(e =>
+            {
+                e.Property(f => f.Quantity).HasPrecision(19, 4);
             });
 
             builder.Entity<Province>(e =>

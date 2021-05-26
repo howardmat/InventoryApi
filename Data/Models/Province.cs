@@ -4,7 +4,7 @@ namespace Data.Models
 {
     public class Province
     {
-        [MaxLength(2)]
+        [MaxLength(3)]
         [Key]
         public string IsoCode { get; set; }
 
