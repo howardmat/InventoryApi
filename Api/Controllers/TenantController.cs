@@ -1,5 +1,4 @@
-﻿using Api.Extensions;
-using Api.Models;
+﻿using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,7 +9,7 @@ namespace Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class TenantController : ControllerBase
+    public class TenantController : InventoryControllerBase
     {
         private readonly TenantRequestService _tenantRequestService;
 
@@ -26,7 +25,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _tenantRequestService.ProcessGetRequestAsync(id);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
 
         // POST api/<controller>
@@ -34,7 +33,7 @@ namespace Api.Controllers
         public async Task<ActionResult<TenantModel>> Post(TenantModel model)
         {
             // Get current user id
-            var userId = this.GetCurrentUserId(User);
+            var userId = await GetCurrentUserIdAsync(User);
 
             // Create new record
             var result = await _tenantRequestService.ProcessCreateRequestAsync(model, userId);

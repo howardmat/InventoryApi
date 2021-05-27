@@ -28,6 +28,14 @@ namespace Data.Repositories
                         .FirstOrDefaultAsync();
         }
 
+        public async Task<User> FindByLocalIdAsync(string localId)
+        {
+            return await (from u in _context.User
+                          where u.LocalId.ToLower() == localId.ToLower()
+                          select u)
+                        .FirstOrDefaultAsync();
+        }
+
         public async Task<User> GetAsync(int id)
         {
             return await (from u in _context.User

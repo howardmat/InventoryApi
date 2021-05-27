@@ -1,5 +1,4 @@
-﻿using Api.Extensions;
-using Api.Models;
+﻿using Api.Models;
 using Api.Services;
 using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +11,7 @@ namespace Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class MaterialCategoryController : ControllerBase
+    public class MaterialCategoryController : InventoryControllerBase
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Material;
 
@@ -30,7 +29,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _categoryRequestService.ProcessListRequestAsync(CATEGORY_TYPE);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
 
         // GET api/<controller>/5
@@ -39,7 +38,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _categoryRequestService.ProcessGetRequestAsync(id);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
 
         // POST api/<controller>
@@ -47,11 +46,11 @@ namespace Api.Controllers
         public async Task<ActionResult<CategoryModel>> Post(CategoryModel model)
         {
             // Get current user id
-            var userId = this.GetCurrentUserId(User);
+            var userId = await GetCurrentUserIdAsync(User);
 
             // Create new record
             var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId);
-            return this.GetResultFromServiceResponse(result,
+            return GetResultFromServiceResponse(result,
                 Url.Action("Get", "MaterialCategory", new { id = result.Data?.Id }));
         }
 
@@ -60,11 +59,11 @@ namespace Api.Controllers
         public async Task<IActionResult> Put(int id, CategoryModel model)
         {
             // Get current user id
-            var userId = this.GetCurrentUserId(User);
+            var userId = await GetCurrentUserIdAsync(User);
 
             // Update existing record
             var result = await _categoryRequestService.ProcessUpdateRequestAsync(id, model, userId);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
 
         // DELETE api/<controller>/5
@@ -72,11 +71,11 @@ namespace Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             // Get current user id
-            var userId = this.GetCurrentUserId(User);
+            var userId = await GetCurrentUserIdAsync(User);
 
             // Update existing record
             var result = await _categoryRequestService.ProcessDeleteRequestAsync(id, userId);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
     }
 }

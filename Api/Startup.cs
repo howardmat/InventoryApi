@@ -98,6 +98,7 @@ namespace Api
             services.AddTransient<UnitOfMeasurementEntityService>();
             services.AddTransient<UnitOfMeasurementRequestService>();
             services.AddTransient<UserEntityService>();
+            services.AddTransient<UserQueryService>();
             services.AddTransient<UserRequestService>();
         }
 

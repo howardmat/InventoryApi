@@ -1,5 +1,4 @@
-﻿using Api.Extensions;
-using Api.Models;
+﻿using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ namespace Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class UnitOfMeasurementController : ControllerBase
+    public class UnitOfMeasurementController : InventoryControllerBase
     {
         private readonly UnitOfMeasurementRequestService _unitOfMeasurementService;
 
@@ -27,7 +26,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _unitOfMeasurementService.ProcessListRequestAsync();
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
 
         // GET api/<controller>/5
@@ -36,7 +35,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _unitOfMeasurementService.ProcessGetRequestAsync(id);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
     }
 }

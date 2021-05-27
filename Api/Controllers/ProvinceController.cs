@@ -1,5 +1,4 @@
-﻿using Api.Extensions;
-using Api.Models;
+﻿using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +10,7 @@ namespace Api.Controllers
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class ProvinceController : ControllerBase
+    public class ProvinceController : InventoryControllerBase
     {
         private readonly ProvinceRequestService _provinceService;
 
@@ -27,7 +26,7 @@ namespace Api.Controllers
         {
             // Get data from service
             var result = await _provinceService.ProcessListRequestAsync(countryCode);
-            return this.GetResultFromServiceResponse(result);
+            return GetResultFromServiceResponse(result);
         }
     }
 }

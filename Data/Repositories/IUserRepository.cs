@@ -8,6 +8,7 @@ namespace Data.Repositories
     {
         Task<IEnumerable<User>> ListAsync();
         Task<User> FindByEmailAsync(string email);
+        Task<User> FindByLocalIdAsync(string localId);
         Task<User> GetAsync(int id);
     }
 }
