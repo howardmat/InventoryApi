@@ -87,11 +87,15 @@ namespace Api.Controllers
         {
             if (_userQueryService == null) throw new Exception("UserQueryService is required for this method to be called.");
 
-            var authProviderUserId = principal.Claims.Where(c => c.Type == CustomClaimTypes.UserId).Select(c => c.Value).FirstOrDefault();
+            var authProviderUserId = principal.Claims.Where(c => c.Type.Equals(CustomClaimTypes.UserId, StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault();
 
-            var userId = await _userQueryService.GetUserIdByAuthProviderIdAsync(authProviderUserId);
+            var userId = await _userQueryService.GetUserIdOrDefaultByAuthProviderIdAsync(authProviderUserId);
+            if (!userId.HasValue)
+            {
+                throw new Exception("UserId not found for currently authenticated user.");
+            }
 
-            return userId;
+            return userId.Value;
         }
     }
 }

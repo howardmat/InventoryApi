@@ -15,8 +15,7 @@ namespace Api.Controllers
         private readonly CountryRequestService _countryRequestService;
 
         public CountryController(
-            UserQueryService userQueryService,
-            CountryRequestService countryRequestService) : base(userQueryService)
+            CountryRequestService countryRequestService)
         {
             _countryRequestService = countryRequestService;
         }

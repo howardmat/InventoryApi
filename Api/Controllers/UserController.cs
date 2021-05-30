@@ -1,5 +1,6 @@
 ﻿using Api.Models;
 using Api.Services;
+using Api.Validation.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -11,12 +12,16 @@ namespace Api.Controllers
     [ApiController]
     public class UserController : InventoryControllerBase
     {
+        private readonly UserPostValidator _userPostValidator;
         private readonly UserRequestService _userRequestService;
 
         public UserController(
-            UserRequestService userRequestService)
+            UserQueryService userQueryService,
+            UserRequestService userRequestService,
+            UserPostValidator userPostValidator) : base(userQueryService)
         {
             _userRequestService = userRequestService;
+            _userPostValidator = userPostValidator;
         }
 
         // GET api/<controller>/id
@@ -32,6 +37,10 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<UserModel>> Post(UserModel model)
         {
+            // Custom validation on UserModel
+            if (!await _userPostValidator.IsValidAsync(model)) 
+                return GetResultFromServiceResponse(_userPostValidator.ServiceResponse);
+
             // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
 

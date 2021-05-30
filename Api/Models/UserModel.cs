@@ -12,6 +12,7 @@ namespace Api.Models
 
         [Required]
         [MaxLength(512)]
+        [EmailAddress]
         public string Email { get; set; }
 
         [Required]

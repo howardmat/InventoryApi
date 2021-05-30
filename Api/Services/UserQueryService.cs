@@ -13,9 +13,9 @@ namespace Api.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<int> GetUserIdByAuthProviderIdAsync(string authProviderUserId)
+        public async Task<int?> GetUserIdOrDefaultByAuthProviderIdAsync(string authProviderUserId)
         {
-            var userId = -1;
+            int? userId = null;
             var user = await _unitOfWork.UserRepository.FindByLocalIdAsync(authProviderUserId);
             
             return user?.Id ?? userId;

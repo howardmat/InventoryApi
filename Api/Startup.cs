@@ -1,5 +1,6 @@
 using Api.Models.MapProfiles;
 using Api.Services;
+using Api.Validation.Validators;
 using Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -100,6 +101,8 @@ namespace Api
             services.AddTransient<UserEntityService>();
             services.AddTransient<UserQueryService>();
             services.AddTransient<UserRequestService>();
+
+            services.AddTransient<UserPostValidator>();
         }
 
         private void AddAutoMapperWithProfiles(IServiceCollection services)
