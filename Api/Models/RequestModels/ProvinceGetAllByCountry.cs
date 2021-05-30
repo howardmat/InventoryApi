@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Api.Models.RequestModels
 {
-    public class ProvinceGet
+    public class ProvinceGetAllByCountry
     {
         [Required]
         public string CountryIsoCode { get; set; }

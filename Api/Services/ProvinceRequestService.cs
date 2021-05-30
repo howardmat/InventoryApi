@@ -38,5 +38,23 @@ namespace Api.Services
 
             return response;
         }
+
+        public async Task<ServiceResponse<ProvinceModel>> ProcessGetRequestAsync(string provinceCode)
+        {
+            var response = new ServiceResponse<ProvinceModel>();
+
+            try
+            {
+                response.Data = await _provinceEntityService.GetAsync(provinceCode);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("ProvinceRequestService.ProcessGetRequestAsync - exception:{@Exception}", ex);
+
+                response.SetException();
+            }
+
+            return response;
+        }
     }
 }

@@ -6,6 +6,7 @@ namespace Data.Repositories
 {
     public interface IProvinceRepository : IRepository<Province>
     {
+        Task<Province> GetAsync(string provinceCode);
         Task<IEnumerable<Province>> ListAsync(string countryCode);
     }
 }

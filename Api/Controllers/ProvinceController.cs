@@ -4,13 +4,11 @@ using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
     [ApiController]
     public class ProvinceController : InventoryControllerBase
     {
@@ -22,12 +20,19 @@ namespace Api.Controllers
             _provinceService = provinceService;
         }
 
-        // GET: api/<controller>
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProvinceModel>>> Get([FromQuery]ProvinceGet model)
+        [HttpGet("api/country/{countryIsoCode}/province")]
+        public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry([FromRoute] ProvinceGetAllByCountry model)
         {
             // Get data from service
             var result = await _provinceService.ProcessListRequestAsync(model.CountryIsoCode);
+            return GetResultFromServiceResponse(result);
+        }
+
+        [HttpGet("api/country/{countryIsoCode}/province/{isoCode}")]
+        public async Task<ActionResult<ProvinceModel>> GetByCode([FromRoute] ProvinceGetByCode model)
+        {
+            // Get data from service
+            var result = await _provinceService.ProcessGetRequestAsync(model.IsoCode);
             return GetResultFromServiceResponse(result);
         }
     }

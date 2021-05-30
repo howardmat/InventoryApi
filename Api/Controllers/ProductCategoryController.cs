@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/product/category")]
     [ApiController]
     public class ProductCategoryController : InventoryControllerBase
     {

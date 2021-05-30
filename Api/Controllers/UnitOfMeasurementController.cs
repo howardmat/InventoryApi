@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/unitofmeasurement")]
     [ApiController]
     public class UnitOfMeasurementController : InventoryControllerBase
     {
