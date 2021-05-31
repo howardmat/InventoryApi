@@ -20,7 +20,6 @@ namespace Api.Controllers
             _countryRequestService = countryRequestService;
         }
 
-        // GET: api/<controller>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
         {

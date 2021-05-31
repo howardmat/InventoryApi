@@ -60,7 +60,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<MaterialModel> CreateAsync(MaterialModel model, int modifyingUserId)
+        public async Task<MaterialModel> CreateAsync(MaterialModel model, int modifyingUserId, int tenantId)
         {
             MaterialModel newModel = null;
 
@@ -75,6 +75,7 @@ namespace Api.Services
                 UnitOfMeasurementId = model.UnitOfMeasurementId.Value,
                 CreatedUserId = modifyingUserId,
                 LastModifiedUserId = modifyingUserId,
+                TenantId = tenantId,
                 CreatedUtc = now,
                 LastModifiedUtc = now
             };

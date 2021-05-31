@@ -15,20 +15,20 @@ namespace Api.Controllers
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Formula;
 
-        private readonly CategoryRequestService _categoryService;
+        private readonly CategoryRequestService _categoryRequestService;
 
         public FormulaCategoryController(
-            UserQueryService userQueryService, 
-            CategoryRequestService categoryService) : base (userQueryService)
+            CategoryRequestService categoryRequestService, 
+            AuthenticationDetailService authDetailService) : base(authDetailService)
         {
-            _categoryService = categoryService;
+            _categoryRequestService = categoryRequestService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
             // Get data from service
-            var result = await _categoryService.ProcessListRequestAsync(CATEGORY_TYPE);
+            var result = await _categoryRequestService.ProcessListRequestAsync(CATEGORY_TYPE);
             return GetResultFromServiceResponse(result);
         }
 
@@ -36,7 +36,7 @@ namespace Api.Controllers
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
             // Get data from service
-            var result = await _categoryService.ProcessGetRequestAsync(id);
+            var result = await _categoryRequestService.ProcessGetRequestAsync(id);
             return GetResultFromServiceResponse(result);
         }
 
@@ -45,9 +45,10 @@ namespace Api.Controllers
         {
             // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
             // Create new record
-            var result = await _categoryService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId);
+            var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId, tenantId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "FormulaCategory", new { id = result.Data?.Id }));
         }
@@ -59,7 +60,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
 
             // Update existing record
-            var result = await _categoryService.ProcessUpdateRequestAsync(id, model, userId);
+            var result = await _categoryRequestService.ProcessUpdateRequestAsync(id, model, userId);
             return GetResultFromServiceResponse(result);
         }
 
@@ -70,7 +71,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
 
             // Update existing record
-            var result = await _categoryService.ProcessDeleteRequestAsync(id, userId);
+            var result = await _categoryRequestService.ProcessDeleteRequestAsync(id, userId);
             return GetResultFromServiceResponse(result);
         }
     }

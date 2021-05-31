@@ -68,8 +68,8 @@ namespace Api.Services
                 model.PrimaryAddress.StreetAddress,
                 model.PrimaryAddress.City,
                 model.PrimaryAddress.PostalCode,
-                model.PrimaryAddress.CountryId.Value,
-                model.PrimaryAddress.ProvinceId,
+                model.PrimaryAddress.CountryIsoCode,
+                model.PrimaryAddress.ProvinceIsoCode,
                 modifyingUserId);
             
             var tenant = new Tenant
@@ -83,6 +83,9 @@ namespace Api.Services
                 LastModifiedUtc = now
             };
             await _unitOfWork.TenantRepository.AddAsync(tenant);
+
+            var ownerUser = await _unitOfWork.UserRepository.GetAsync(modifyingUserId);
+            ownerUser.Tenant = tenant;
 
             // Save data
             if (await _unitOfWork.CompleteAsync() > 0)
@@ -110,8 +113,8 @@ namespace Api.Services
                     model.PrimaryAddress.StreetAddress,
                     model.PrimaryAddress.City,
                     model.PrimaryAddress.PostalCode,
-                    model.PrimaryAddress.CountryId.Value,
-                    model.PrimaryAddress.ProvinceId,
+                    model.PrimaryAddress.CountryIsoCode,
+                    model.PrimaryAddress.ProvinceIsoCode,
                     modifyingUserId);
             }
             else
@@ -120,8 +123,8 @@ namespace Api.Services
                     model.PrimaryAddress.StreetAddress, 
                     model.PrimaryAddress.City,
                     model.PrimaryAddress.PostalCode,
-                    model.PrimaryAddress.CountryId.Value,
-                    model.PrimaryAddress.ProvinceId,
+                    model.PrimaryAddress.CountryIsoCode,
+                    model.PrimaryAddress.ProvinceIsoCode,
                     modifyingUserId);
             }            
 

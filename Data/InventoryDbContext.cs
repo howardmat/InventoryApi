@@ -30,6 +30,19 @@ namespace Data
             base.OnModelCreating(builder);
 
             #region Model Configuration
+            builder.Entity<Address>(e =>
+            {
+                e.HasOne(u => u.Province)
+                    .WithMany()
+                    .HasForeignKey(u => new { u.ProvinceIsoCode, u.CountryIsoCode })
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(u => u.Country)
+                    .WithMany()
+                    .HasForeignKey(u => u.CountryIsoCode)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<FormulaIngredient>(e =>
             {
                 e.Property(f => f.Quantity).HasPrecision(19, 4);
@@ -79,6 +92,10 @@ namespace Data
                     .WithMany()
                     .HasForeignKey(u => u.OwnerUserId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(u => u.PrimaryAddress)
+                    .WithMany()
+                    .HasForeignKey(u => u.PrimaryAddressId);
             });
 
             builder.Entity<User>(e =>

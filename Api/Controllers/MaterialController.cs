@@ -15,12 +15,12 @@ namespace Api.Controllers
         private readonly MaterialRequestService _materialRequestService;
 
         public MaterialController(
-            MaterialRequestService materialRequestService)
+            MaterialRequestService materialRequestService,
+            AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _materialRequestService = materialRequestService;
         }
 
-        // GET: api/<controller>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MaterialModel>>> Get()
         {
@@ -29,7 +29,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // GET api/<controller>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<MaterialModel>> Get(int id)
         {
@@ -38,20 +37,19 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // POST api/<controller>
         [HttpPost]
         public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
         {
             // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
             // Create new record
-            var result = await _materialRequestService.ProcessCreateRequestAsync(model, userId);
+            var result = await _materialRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "Material", new { id = result.Data?.Id }));
         }
 
-        // PUT api/<controller>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, MaterialModel model)
         {
@@ -63,7 +61,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

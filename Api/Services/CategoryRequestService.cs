@@ -60,13 +60,13 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryModel model, CategoryType categoryType, int createdByUserId)
+        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryModel model, CategoryType categoryType, int createdByUserId, int tenantId)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
-                response.Data = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId);
+                response.Data = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId, tenantId);
                 if (response.Data == null)
                 {
                     response.SetError("An unexpected error occurred while saving the Category object");

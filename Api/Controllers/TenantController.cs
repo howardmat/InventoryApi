@@ -14,12 +14,12 @@ namespace Api.Controllers
         private readonly TenantRequestService _tenantRequestService;
 
         public TenantController(
-            TenantRequestService tenantRequestService)
+            TenantRequestService tenantRequestService,
+            AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _tenantRequestService = tenantRequestService;
         }
 
-        // GET api/<controller>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TenantModel>> Get(int id)
         {
@@ -28,7 +28,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // POST api/<controller>
         [HttpPost]
         public async Task<ActionResult<TenantModel>> Post(TenantModel model)
         {

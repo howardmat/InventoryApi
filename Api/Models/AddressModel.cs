@@ -18,10 +18,10 @@ namespace Api.Models
         public string PostalCode { get; set; }
 
         [Required]
-        public int? CountryId { get; set; }
+        public string CountryIsoCode { get; set; }
 
         [Required]
-        public int? ProvinceId { get; set; }
+        public string ProvinceIsoCode { get; set; }
 
         public virtual CountryModel Country { get; set; }
         public virtual ProvinceModel Province { get; set; }

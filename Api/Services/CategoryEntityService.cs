@@ -59,7 +59,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<CategoryModel> CreateAsync(string name, CategoryType categoryType, int modifyingUserId)
+        public async Task<CategoryModel> CreateAsync(string name, CategoryType categoryType, int modifyingUserId, int tenantId)
         {
             CategoryModel model = null;
 
@@ -70,6 +70,7 @@ namespace Api.Services
             {
                 Name = name,
                 Type = categoryType,
+                TenantId = tenantId,
                 CreatedUserId = modifyingUserId,
                 CreatedUtc = now,
                 LastModifiedUserId = modifyingUserId,

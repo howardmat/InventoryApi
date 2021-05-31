@@ -1,11 +1,9 @@
-﻿using Api.Claims;
-using Api.Enums;
+﻿using Api.Enums;
 using Api.Models;
 using Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -13,14 +11,14 @@ namespace Api.Controllers
 {
     public class InventoryControllerBase : ControllerBase
     {
-        private readonly UserQueryService _userQueryService;
+        private readonly AuthenticationDetailService _authenticationDetailService;
 
         public InventoryControllerBase() { }
 
         public InventoryControllerBase(
-            UserQueryService userQueryService)
+            AuthenticationDetailService authenticationDetailService)
         {
-            _userQueryService = userQueryService;
+            _authenticationDetailService = authenticationDetailService;
         }
 
         protected ActionResult GetResultFromServiceResponse(ServiceResponse response)
@@ -85,17 +83,20 @@ namespace Api.Controllers
 
         protected async Task<int> GetCurrentUserIdAsync(ClaimsPrincipal principal)
         {
-            if (_userQueryService == null) throw new Exception("UserQueryService is required for this method to be called.");
+            if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentUserIdAsync to be called in child class.");
 
-            var authProviderUserId = principal.Claims.Where(c => c.Type.Equals(CustomClaimTypes.UserId, StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault();
+            var userId = await _authenticationDetailService.GetUserIdBasedOnClaimsAsync(principal);
 
-            var userId = await _userQueryService.GetUserIdOrDefaultByAuthProviderIdAsync(authProviderUserId);
-            if (!userId.HasValue)
-            {
-                throw new Exception("UserId not found for currently authenticated user.");
-            }
+            return userId;
+        }
 
-            return userId.Value;
+        protected int GetCurrentTenantId(ClaimsPrincipal principal)
+        {
+            if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentTenantIdAsync to be called in child class.");
+
+            var userId = _authenticationDetailService.GetTenantIdBasedOnClaims(principal);
+
+            return userId;
         }
     }
 }

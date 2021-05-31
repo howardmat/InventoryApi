@@ -16,15 +16,14 @@ namespace Api.Controllers
         private readonly UserRequestService _userRequestService;
 
         public UserController(
-            UserQueryService userQueryService,
+            AuthenticationDetailService authDetailService,
             UserRequestService userRequestService,
-            UserPostValidator userPostValidator) : base(userQueryService)
+            UserPostValidator userPostValidator) : base(authDetailService)
         {
             _userRequestService = userRequestService;
             _userPostValidator = userPostValidator;
         }
 
-        // GET api/<controller>/id
         [HttpGet("{id}")]
         public async Task<ActionResult<UserModel>> Get(int id)
         {
@@ -33,7 +32,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // POST api/<controller>
         [HttpPost]
         public async Task<ActionResult<UserModel>> Post(UserModel model)
         {

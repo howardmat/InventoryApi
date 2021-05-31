@@ -11,15 +11,15 @@ namespace Data.Models
             string streetAddress,
             string city,
             string postalCode,
-            int countryId,
-            int? provinceId = null,
+            string countryIsoCode,
+            string provinceIsoCode = null,
             int? modifyingUserId = null)
         {
             StreetAddress = streetAddress;
             City = city;
             PostalCode = postalCode;
-            ProvinceId = provinceId;
-            CountryId = countryId;
+            ProvinceIsoCode = provinceIsoCode;
+            CountryIsoCode = countryIsoCode;
 
             var now = DateTime.Now;
             CreatedUserId = modifyingUserId;
@@ -36,25 +36,27 @@ namespace Data.Models
         [MaxLength(15)]
         public string PostalCode { get; set; }
 
-        public int? ProvinceId { get; set; }
+        [MaxLength(3)]
+        public string ProvinceIsoCode { get; set; }
         public virtual Province Province { get; set; }
 
-        public int CountryId { get; set; }
+        [MaxLength(2)]
+        public string CountryIsoCode { get; set; }
         public virtual Country Country { get; set; }
 
         public void Update(
             string street,
             string city,
             string postalCode,
-            int countryId,
-            int? provinceId = null,
+            string countryIsoCode,
+            string provinceIsoCode = null,
             int? modifyingUserId = null)
         {
             StreetAddress = street;
             City = city;
             PostalCode = postalCode;
-            CountryId = countryId;
-            ProvinceId = provinceId;
+            CountryIsoCode = countryIsoCode;
+            ProvinceIsoCode = provinceIsoCode;
 
             LastModifiedUserId = modifyingUserId;
             LastModifiedUtc = DateTime.UtcNow;

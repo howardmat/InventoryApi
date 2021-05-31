@@ -20,7 +20,6 @@ namespace Api.Controllers
             _unitOfMeasurementService = unitOfMeasurementService;
         }
 
-        // GET: api/<controller>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
         {
@@ -29,7 +28,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // GET api/<controller>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
         {

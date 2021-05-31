@@ -18,12 +18,12 @@ namespace Api.Controllers
         private readonly CategoryRequestService _categoryRequestService;
 
         public MaterialCategoryController(
-            CategoryRequestService categoryRequestService)
+            CategoryRequestService categoryRequestService,
+            AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _categoryRequestService = categoryRequestService;
         }
 
-        // GET: api/<controller>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
@@ -32,7 +32,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // GET api/<controller>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
@@ -41,20 +40,19 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // POST api/<controller>
         [HttpPost]
         public async Task<ActionResult<CategoryModel>> Post(CategoryModel model)
         {
             // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
             // Create new record
-            var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId);
+            var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId, tenantId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "MaterialCategory", new { id = result.Data?.Id }));
         }
 
-        // PUT api/<controller>/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, CategoryModel model)
         {
@@ -66,7 +64,6 @@ namespace Api.Controllers
             return GetResultFromServiceResponse(result);
         }
 
-        // DELETE api/<controller>/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

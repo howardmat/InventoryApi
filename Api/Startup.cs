@@ -1,3 +1,4 @@
+using Api.Claims;
 using Api.Models.MapProfiles;
 using Api.Services;
 using Api.Validation.Validators;
@@ -76,6 +77,8 @@ namespace Api
 
             app.UseAuthorization();
 
+            app.UseInjectTenantIdClaim();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -86,6 +89,7 @@ namespace Api
         {
             services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
 
+            services.AddTransient<AuthenticationDetailService>();
             services.AddTransient<CategoryEntityService>();
             services.AddTransient<CategoryRequestService>();
             services.AddTransient<CountryEntityService>();

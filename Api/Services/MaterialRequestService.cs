@@ -59,13 +59,13 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<MaterialModel>> ProcessCreateRequestAsync(MaterialModel model, int createdByUserId)
+        public async Task<ServiceResponse<MaterialModel>> ProcessCreateRequestAsync(MaterialModel model, int createdByUserId, int tenantId)
         {
             var response = new ServiceResponse<MaterialModel>();
 
             try
             {
-                response.Data = await _materialEntityService.CreateAsync(model, createdByUserId);
+                response.Data = await _materialEntityService.CreateAsync(model, createdByUserId, tenantId);
                 if (response.Data == null)
                 {
                     response.SetError("An unexpected error occurred while saving the Material object");
