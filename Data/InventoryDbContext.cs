@@ -18,7 +18,7 @@ namespace Data
         public DbSet<FormulaIngredient> FormulaIngredient { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
         public DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
-        public DbSet<User> User { get; set; }
+        public DbSet<UserProfile> UserProfile { get; set; }
 
         public InventoryDbContext(DbContextOptions<InventoryDbContext> options)
             : base(options)
@@ -98,8 +98,10 @@ namespace Data
                     .HasForeignKey(u => u.PrimaryAddressId);
             });
 
-            builder.Entity<User>(e =>
+            builder.Entity<UserProfile>(e =>
             {
+                e.ToTable("UserProfile");
+
                 e.HasOne(u => u.Tenant)
                     .WithMany(t => t.Users)
                     .HasForeignKey(u => u.TenantId)

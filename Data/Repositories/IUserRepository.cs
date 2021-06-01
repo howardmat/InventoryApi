@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository : IRepository<UserProfile>
     {
-        Task<IEnumerable<User>> ListAsync();
-        Task<User> FindByEmailAsync(string email);
-        Task<User> FindByLocalIdAsync(string localId);
-        Task<User> GetAsync(int id);
+        Task<IEnumerable<UserProfile>> ListAsync();
+        Task<UserProfile> FindByEmailAsync(string email);
+        Task<UserProfile> FindByLocalIdAsync(string localId);
+        Task<UserProfile> GetAsync(int id);
     }
 }

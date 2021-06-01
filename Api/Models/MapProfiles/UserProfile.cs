@@ -7,7 +7,7 @@ namespace Api.Models.MapProfiles
     {
         public UserProfile()
         {
-            CreateMap<User, UserModel>();
+            CreateMap<Data.Models.UserProfile, UserModel>();
         }
     }
 }

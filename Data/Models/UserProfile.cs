@@ -2,7 +2,7 @@
 
 namespace Data.Models
 {
-    public class User : InventoryBaseModel
+    public class UserProfile : InventoryBaseModel
     {
         [MaxLength(1024)]
         public string LocalId { get; set; }

@@ -98,6 +98,7 @@ namespace Api
             services.AddTransient<MaterialRequestService>();
             services.AddTransient<ProvinceEntityService>();
             services.AddTransient<ProvinceRequestService>();
+            services.AddTransient<RegisterRequestService>();
             services.AddTransient<TenantEntityService>();
             services.AddTransient<TenantRequestService>();
             services.AddTransient<UnitOfMeasurementEntityService>();
@@ -107,6 +108,7 @@ namespace Api
             services.AddTransient<UserRequestService>();
 
             services.AddTransient<UserPostValidator>();
+            services.AddTransient<RegisterPostValidator>();
         }
 
         private void AddAutoMapperWithProfiles(IServiceCollection services)

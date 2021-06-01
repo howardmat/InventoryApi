@@ -36,7 +36,7 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<User> GetEntityOrDefaultAsync(int id)
+        public async Task<UserProfile> GetEntityOrDefaultAsync(int id)
         {
             // Fetch object
             var entity = await _unitOfWork.UserRepository.GetAsync(id);
@@ -58,14 +58,14 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<UserModel> CreateAsync(string localId, string email, string firstName, string lastName, int modifyingUserId)
+        public async Task<UserModel> CreateAsync(string localId, string email, string firstName, string lastName, int? modifyingUserId = null)
         {
             UserModel model = null;
 
             var now = DateTime.UtcNow;
 
             // Build and add the new object
-            var user = new User
+            var user = new UserProfile
             {
                 LocalId = localId,
                 FirstName = firstName,
@@ -87,7 +87,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<bool> UpdateAsync(User user, UserModel userModel, int modifyingUserId)
+        public async Task<bool> UpdateAsync(UserProfile user, UserModel userModel, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 
@@ -103,7 +103,7 @@ namespace Api.Services
             return success;
         }
 
-        public async Task<bool> DeleteAsync(User user, int modifyingUserId)
+        public async Task<bool> DeleteAsync(UserProfile user, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 
