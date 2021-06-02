@@ -58,7 +58,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<TenantModel> CreateAsync(TenantModel model, int modifyingUserId)
+        public async Task<TenantModel> CreateAsync(TenantModel model, int modifyingUserId, bool assignCreatorAsOwner = false)
         {
             TenantModel newModel = null;
 
@@ -84,8 +84,11 @@ namespace Api.Services
             };
             await _unitOfWork.TenantRepository.AddAsync(tenant);
 
-            var ownerUser = await _unitOfWork.UserRepository.GetAsync(modifyingUserId);
-            ownerUser.Tenant = tenant;
+            if (assignCreatorAsOwner)
+            {
+                var ownerUser = await _unitOfWork.UserRepository.GetAsync(modifyingUserId);
+                ownerUser.Tenant = tenant;
+            }
 
             // Save data
             if (await _unitOfWork.CompleteAsync() > 0)

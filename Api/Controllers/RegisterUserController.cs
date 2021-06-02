@@ -7,23 +7,23 @@ using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
-    [Route("api/register")]
+    [Route("api/register/userprofile")]
     [ApiController]
-    public class RegisterController : InventoryControllerBase
+    public class RegisterUserController : InventoryControllerBase
     {
-        private readonly RegisterPostValidator _registerPostValidator;
-        private readonly RegisterRequestService _registerRequestService;
+        private readonly RegisterUserPostValidator _registerPostValidator;
+        private readonly RegisterUserRequestService _registerRequestService;
 
-        public RegisterController(
-            RegisterRequestService registerRequestService,
-            RegisterPostValidator registerPostValidator)
+        public RegisterUserController(
+            RegisterUserRequestService registerRequestService,
+            RegisterUserPostValidator registerPostValidator)
         {
             _registerRequestService = registerRequestService;
             _registerPostValidator = registerPostValidator;
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserModel>> Post(RegisterPost model)
+        public async Task<ActionResult<UserModel>> Post(RegisterUserPost model)
         {
             // Custom validation on UserModel
             if (!await _registerPostValidator.IsValidAsync(model))

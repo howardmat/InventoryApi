@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class RegisterRequestService
+    public class RegisterUserRequestService
     {
-        private readonly ILogger<RegisterRequestService> _logger;
+        private readonly ILogger<RegisterUserRequestService> _logger;
         private readonly UserEntityService _userEntityService;
 
-        public RegisterRequestService(
-            ILogger<RegisterRequestService> logger,
+        public RegisterUserRequestService(
+            ILogger<RegisterUserRequestService> logger,
             UserEntityService userEntityService)
         {
             _logger = logger;
             _userEntityService = userEntityService;
         }
 
-        public async Task<ServiceResponse<UserModel>> ProcessRegisterRequestAsync(RegisterPost model)
+        public async Task<ServiceResponse<UserModel>> ProcessRegisterRequestAsync(RegisterUserPost model)
         {
             var response = new ServiceResponse<UserModel>();
 

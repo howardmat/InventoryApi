@@ -4,17 +4,17 @@ using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public class RegisterPostValidator : InventoryValidatorAsyncBase<RegisterPost>
+    public class RegisterUserPostValidator : InventoryValidatorAsyncBase<RegisterUserPost>
     {
         private readonly UserQueryService _userQueryService;
 
-        public RegisterPostValidator(
+        public RegisterUserPostValidator(
             UserQueryService userQueryService)
         {
             _userQueryService = userQueryService;
         }
 
-        public override async Task<bool> IsValidAsync(RegisterPost item)
+        public override async Task<bool> IsValidAsync(RegisterUserPost item)
         {
             var isValid = true;
 
