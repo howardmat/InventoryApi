@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using Api.Models.RequestModels;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -60,13 +61,19 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<TenantModel>> ProcessCreateRequestAsync(TenantModel model, int createdByUserId)
+        public async Task<ServiceResponse<TenantModel>> ProcessCreateRequestAsync(TenantPost model, int createdByUserId)
         {
             var response = new ServiceResponse<TenantModel>();
 
             try
             {
-                response.Data = await _tenantEntityService.CreateAsync(model, createdByUserId);
+                var tenantModel = new TenantModel
+                {
+                    CompanyName = model.CompanyName,
+                    PrimaryAddress = model.PrimaryAddress
+                };
+
+                response.Data = await _tenantEntityService.CreateAsync(tenantModel, createdByUserId);
                 if (response.Data == null)
                 {
                     response.SetError("An unexpected error occurred while saving the Tenant object");

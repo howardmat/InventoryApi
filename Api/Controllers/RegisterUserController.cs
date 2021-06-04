@@ -25,11 +25,9 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<UserModel>> Post(RegisterUserPost model)
         {
-            // Custom validation on UserModel
             if (!await _registerPostValidator.IsValidAsync(model))
                 return GetResultFromServiceResponse(_registerPostValidator.ServiceResponse);
 
-            // Create new record
             var result = await _registerRequestService.ProcessRegisterRequestAsync(model);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "User", new { id = result.Data?.Id }));

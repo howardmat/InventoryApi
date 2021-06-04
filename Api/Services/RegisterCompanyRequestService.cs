@@ -1,5 +1,4 @@
 ﻿using Api.Models;
-using Api.Models.RequestModels;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;

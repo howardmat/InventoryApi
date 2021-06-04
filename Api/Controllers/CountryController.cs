@@ -23,7 +23,6 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
         {
-            // Get data from service
             var serviceResponse = await _countryRequestService.ProcessListRequestAsync();
             return GetResultFromServiceResponse(serviceResponse);
         }

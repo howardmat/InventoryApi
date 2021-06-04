@@ -27,7 +27,6 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UserModel>> Get(int id)
         {
-            // Get data from service
             var result = await _userRequestService.ProcessGetRequestAsync(id);
             return GetResultFromServiceResponse(result);
         }
@@ -35,14 +34,11 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<UserModel>> Post(UserModel model)
         {
-            // Custom validation on UserModel
             if (!await _userPostValidator.IsValidAsync(model)) 
                 return GetResultFromServiceResponse(_userPostValidator.ServiceResponse);
 
-            // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
 
-            // Create new record
             var result = await _userRequestService.ProcessCreateRequestAsync(model, userId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "User", new { id = result.Data?.Id }));

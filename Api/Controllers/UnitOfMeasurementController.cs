@@ -23,7 +23,6 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
         {
-            // Get data from service
             var result = await _unitOfMeasurementService.ProcessListRequestAsync();
             return GetResultFromServiceResponse(result);
         }
@@ -31,7 +30,6 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
         {
-            // Get data from service
             var result = await _unitOfMeasurementService.ProcessGetRequestAsync(id);
             return GetResultFromServiceResponse(result);
         }

@@ -24,7 +24,6 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MaterialModel>>> Get()
         {
-            // Get data from service
             var result = await _materialRequestService.ProcessListRequestAsync();
             return GetResultFromServiceResponse(result);
         }
@@ -32,7 +31,6 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MaterialModel>> Get(int id)
         {
-            // Get data from service
             var result = await _materialRequestService.ProcessGetRequestAsync(id);
             return GetResultFromServiceResponse(result);
         }
@@ -40,11 +38,9 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
         {
-            // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
-            // Create new record
             var result = await _materialRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "Material", new { id = result.Data?.Id }));
@@ -53,10 +49,8 @@ namespace Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, MaterialModel model)
         {
-            // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
 
-            // Update existing record
             var result = await _materialRequestService.ProcessUpdateRequestAsync(id, model, userId);
             return GetResultFromServiceResponse(result);
         }
@@ -64,10 +58,8 @@ namespace Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            // Get current user id
             var userId = await GetCurrentUserIdAsync(User);
 
-            // Update existing record
             var result = await _materialRequestService.ProcessDeleteRequestAsync(id, userId);
             return GetResultFromServiceResponse(result);
         }

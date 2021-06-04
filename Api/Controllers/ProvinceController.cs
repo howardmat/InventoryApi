@@ -23,7 +23,6 @@ namespace Api.Controllers
         [HttpGet("api/country/{countryIsoCode}/province")]
         public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry([FromRoute] ProvinceGetAllByCountry model)
         {
-            // Get data from service
             var result = await _provinceService.ProcessListRequestAsync(model.CountryIsoCode);
             return GetResultFromServiceResponse(result);
         }
@@ -31,7 +30,6 @@ namespace Api.Controllers
         [HttpGet("api/country/{countryIsoCode}/province/{isoCode}")]
         public async Task<ActionResult<ProvinceModel>> GetByCode([FromRoute] ProvinceGetByCode model)
         {
-            // Get data from service
             var result = await _provinceService.ProcessGetRequestAsync(model.IsoCode);
             return GetResultFromServiceResponse(result);
         }

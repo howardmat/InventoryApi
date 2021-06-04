@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using Api.Models.RequestModels;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,19 +24,14 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<TenantModel>> Get(int id)
         {
-            // Get data from service
             var result = await _tenantRequestService.ProcessGetRequestAsync(id);
             return GetResultFromServiceResponse(result);
         }
 
         [HttpPost]
-        public async Task<ActionResult<TenantModel>> Post(TenantModel model)
+        public async Task<ActionResult<TenantModel>> Post(TenantPost model)
         {
-            // Get current user id
-            var userId = await GetCurrentUserIdAsync(User);
-
-            // Create new record
-            var result = await _tenantRequestService.ProcessCreateRequestAsync(model, userId);
+            var result = await _tenantRequestService.ProcessCreateRequestAsync(model, model.OwnerUserId.Value);
             return this.GetResultFromServiceResponse(result,
                 Url.Action("Get", "Tenant", new { id = result.Data?.Id }));
         }
