@@ -30,5 +30,14 @@ namespace Data.Repositories
                           .Include(t => t.PrimaryAddress.Province)
                         .FirstOrDefaultAsync();
         }
+
+        public async Task<Tenant> FindByOwnerIdAsync(int ownerUserId)
+        {
+            return await (from e in _context.Tenant
+                          where e.OwnerUserId == ownerUserId
+                            && !e.DeletedUtc.HasValue
+                          select e)
+                        .FirstOrDefaultAsync();
+        }
     }
 }

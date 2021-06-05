@@ -99,16 +99,18 @@ namespace Api
             services.AddTransient<ProvinceEntityService>();
             services.AddTransient<ProvinceRequestService>();
             services.AddTransient<RegisterUserRequestService>();
+            services.AddTransient<RegisterCompanyRequestService>();
             services.AddTransient<TenantEntityService>();
             services.AddTransient<TenantRequestService>();
             services.AddTransient<UnitOfMeasurementEntityService>();
             services.AddTransient<UnitOfMeasurementRequestService>();
             services.AddTransient<UserEntityService>();
-            services.AddTransient<UserQueryService>();
             services.AddTransient<UserRequestService>();
 
             services.AddTransient<UserPostValidator>();
             services.AddTransient<RegisterUserPostValidator>();
+            services.AddTransient<RegisterCompanyPostValidator>();
+            services.AddTransient<TenantPostValidator>();
         }
 
         private void AddAutoMapperWithProfiles(IServiceCollection services)

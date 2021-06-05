@@ -8,5 +8,6 @@ namespace Data.Repositories
     {
         Task<IEnumerable<Tenant>> ListAsync();
         Task<Tenant> GetAsync(int id);
+        Task<Tenant> FindByOwnerIdAsync(int ownerUserId);
     }
 }

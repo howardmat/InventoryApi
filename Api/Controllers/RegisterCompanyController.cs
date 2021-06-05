@@ -1,5 +1,6 @@
 ﻿using Api.Models;
 using Api.Services;
+using Api.Validation.Validators;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -10,12 +11,15 @@ namespace Api.Controllers
     public class RegisterCompanyController : InventoryControllerBase
     {
         private readonly RegisterCompanyRequestService _registerCompanyRequestService;
+        private readonly RegisterCompanyPostValidator _registerCompanyPostValidator;
 
         public RegisterCompanyController(
             RegisterCompanyRequestService registerCompanyRequestService,
+            RegisterCompanyPostValidator registerCompanyPostValidator,
             AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _registerCompanyRequestService = registerCompanyRequestService;
+            _registerCompanyPostValidator = registerCompanyPostValidator;
         }
 
         [HttpPost]
@@ -23,8 +27,11 @@ namespace Api.Controllers
         {
             var userId = await GetCurrentUserIdAsync(User);
 
+            if (!await _registerCompanyPostValidator.IsValidAsync(userId))
+                return GetResultFromServiceResponse(_registerCompanyPostValidator.ServiceResponse);
+
             var result = await _registerCompanyRequestService.ProcessRegisterRequestAsync(model, userId);
-            return this.GetResultFromServiceResponse(result,
+            return GetResultFromServiceResponse(result,
                 Url.Action("Get", "Tenant", new { id = result.Data?.Id }));
         }
     }

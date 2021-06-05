@@ -4,25 +4,25 @@ using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public class UserPostValidator : InventoryValidatorAsyncBase<UserModel>
+    public class RegisterCompanyPostValidator : InventoryValidatorAsyncBase<int>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserPostValidator(
+        public RegisterCompanyPostValidator(
             IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public override async Task<bool> IsValidAsync(UserModel item)
+        public override async Task<bool> IsValidAsync(int userId)
         {
             var isValid = true;
 
-            var user = await _unitOfWork.UserRepository.FindByLocalIdAsync(item.LocalId);
-            if (user != null)
+            var tenant = await _unitOfWork.TenantRepository.FindByOwnerIdAsync(userId);
+            if (tenant != null)
             {
                 isValid = false;
-                ServiceResponse.SetError("LocalId found for existing user");
+                ServiceResponse.SetError("OwnerUserId found for existing tenant");
             }
 
             return isValid;

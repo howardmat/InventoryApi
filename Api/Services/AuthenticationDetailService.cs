@@ -1,4 +1,5 @@
 ﻿using Api.Claims;
+using Data;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -8,12 +9,12 @@ namespace Api.Services
 {
     public class AuthenticationDetailService
     {
-        private readonly UserQueryService _userQueryService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public AuthenticationDetailService(
-            UserQueryService userQueryService)
+            IUnitOfWork unitOfWork)
         {
-            _userQueryService = userQueryService;
+            _unitOfWork = unitOfWork;
         }
 
         public string GetAuthenticationProviderUserIdOrDefault(ClaimsPrincipal principal)
@@ -34,13 +35,13 @@ namespace Api.Services
         {
             var authProviderUserId = GetAuthenticationProviderUserIdOrDefault(principal);
 
-            var userId = await _userQueryService.GetUserIdOrDefaultByAuthProviderIdAsync(authProviderUserId);
-            if (!userId.HasValue)
+            var user = await _unitOfWork.UserRepository.FindByLocalIdAsync(authProviderUserId);
+            if (user == null)
             {
                 throw new Exception("UserId not found for currently authenticated user.");
             }
 
-            return userId.Value;
+            return user.Id;
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public abstract class InventoryValidatorAsyncBase<T> : IValidatorAsync<T> where T : class, new()
+    public abstract class InventoryValidatorAsyncBase<T> : IValidatorAsync<T> 
     {
         public ServiceResponse ServiceResponse => _serviceResponse;
 
