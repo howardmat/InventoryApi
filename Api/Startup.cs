@@ -108,6 +108,7 @@ namespace Api
             services.AddTransient<UserRequestService>();
 
             services.AddTransient<UserPostValidator>();
+            services.AddTransient<MaterialRequestValidator>();
             services.AddTransient<RegisterUserPostValidator>();
             services.AddTransient<RegisterCompanyPostValidator>();
             services.AddTransient<TenantPostValidator>();

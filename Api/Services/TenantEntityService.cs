@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Extensions;
+using Api.Models;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -67,7 +68,7 @@ namespace Api.Services
             var tenantAddress = new Address(
                 model.PrimaryAddress.StreetAddress,
                 model.PrimaryAddress.City,
-                model.PrimaryAddress.PostalCode,
+                model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
                 model.PrimaryAddress.CountryIsoCode,
                 model.PrimaryAddress.ProvinceIsoCode,
                 modifyingUserId);
@@ -115,7 +116,7 @@ namespace Api.Services
                 tenant.PrimaryAddress = new Address(
                     model.PrimaryAddress.StreetAddress,
                     model.PrimaryAddress.City,
-                    model.PrimaryAddress.PostalCode,
+                    model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
                     model.PrimaryAddress.CountryIsoCode,
                     model.PrimaryAddress.ProvinceIsoCode,
                     modifyingUserId);
@@ -125,7 +126,7 @@ namespace Api.Services
                 tenant.PrimaryAddress.Update(
                     model.PrimaryAddress.StreetAddress, 
                     model.PrimaryAddress.City,
-                    model.PrimaryAddress.PostalCode,
+                    model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
                     model.PrimaryAddress.CountryIsoCode,
                     model.PrimaryAddress.ProvinceIsoCode,
                     modifyingUserId);

@@ -1,5 +1,7 @@
 ﻿using Api.Models;
 using Api.Services;
+using Api.Validation.Validators;
+using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -12,13 +14,18 @@ namespace Api.Controllers
     [ApiController]
     public class MaterialController : InventoryControllerBase
     {
+        private const CategoryType CATEGORY_TYPE = CategoryType.Material;
+
         private readonly MaterialRequestService _materialRequestService;
+        private readonly MaterialRequestValidator _materialRequestValidator;
 
         public MaterialController(
             MaterialRequestService materialRequestService,
+            MaterialRequestValidator materialRequestValidator,
             AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _materialRequestService = materialRequestService;
+            _materialRequestValidator = materialRequestValidator;
         }
 
         [HttpGet]
@@ -38,6 +45,9 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
         {
+            if (!await _materialRequestValidator.IsValidAsync(model, CATEGORY_TYPE))
+                return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
+
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
@@ -49,6 +59,9 @@ namespace Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, MaterialModel model)
         {
+            if (!await _materialRequestValidator.IsValidAsync(model, CATEGORY_TYPE))
+                return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
+
             var userId = await GetCurrentUserIdAsync(User);
 
             var result = await _materialRequestService.ProcessUpdateRequestAsync(id, model, userId);
