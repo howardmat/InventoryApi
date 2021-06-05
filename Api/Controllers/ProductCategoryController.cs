@@ -34,7 +34,7 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
-            var result = await _categoryRequestService.ProcessGetRequestAsync(id);
+            var result = await _categoryRequestService.ProcessGetRequestAsync(CATEGORY_TYPE, id);
             return GetResultFromServiceResponse(result);
         }
 
@@ -44,7 +44,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
-            var result = await _categoryRequestService.ProcessCreateRequestAsync(model, CATEGORY_TYPE, userId, tenantId);
+            var result = await _categoryRequestService.ProcessCreateRequestAsync(CATEGORY_TYPE, model, userId, tenantId);
             return GetResultFromServiceResponse(result,
                 Url.Action("Get", "ProductCategory", new { id = result.Data?.Id }));
         }
@@ -54,7 +54,7 @@ namespace Api.Controllers
         {
             var userId = await GetCurrentUserIdAsync(User);
 
-            var result = await _categoryRequestService.ProcessUpdateRequestAsync(id, model, userId);
+            var result = await _categoryRequestService.ProcessUpdateRequestAsync(CATEGORY_TYPE, id, model, userId);
             return GetResultFromServiceResponse(result);
         }
 
@@ -63,7 +63,7 @@ namespace Api.Controllers
         {
             var userId = await GetCurrentUserIdAsync(User);
 
-            var result = await _categoryRequestService.ProcessDeleteRequestAsync(id, userId);
+            var result = await _categoryRequestService.ProcessDeleteRequestAsync(CATEGORY_TYPE, id, userId);
             return GetResultFromServiceResponse(result);
         }
     }

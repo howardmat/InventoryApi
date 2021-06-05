@@ -45,13 +45,13 @@ namespace Api.Services
             return entity;
         }
 
-        public async Task<CategoryModel> GetModelOrDefaultAsync(int id)
+        public async Task<CategoryModel> GetModelOrDefaultAsync(CategoryType categoryType, int id)
         {
             CategoryModel model = null;
 
             // Fetch object
             var category = await GetEntityOrDefaultAsync(id);
-            if (category != null)
+            if (category != null && category.Type == categoryType)
             {
                 model = _mapper.Map<CategoryModel>(category);
             }

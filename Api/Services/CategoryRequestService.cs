@@ -38,16 +38,20 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> ProcessGetRequestAsync(int id)
+        public async Task<ServiceResponse<CategoryModel>> ProcessGetRequestAsync(CategoryType requestCategoryType, int id)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
-                response.Data = await _categoryEntityService.GetModelOrDefaultAsync(id);
-                if (response.Data == null)
+                var category = await _categoryEntityService.GetModelOrDefaultAsync(requestCategoryType, id);
+                if (category != null)
                 {
-                    response.SetNotFound($"Unable to locate Category object ({id})");
+                    response.Data = category;
+                }
+                else
+                {
+                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
                 }
             }
             catch (Exception ex)
@@ -60,16 +64,16 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryModel model, CategoryType categoryType, int createdByUserId, int tenantId)
+        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryType requestCategoryType, CategoryModel model, int createdByUserId, int tenantId)
         {
             var response = new ServiceResponse<CategoryModel>();
 
             try
             {
-                response.Data = await _categoryEntityService.CreateAsync(model.Name, categoryType, createdByUserId, tenantId);
+                response.Data = await _categoryEntityService.CreateAsync(model.Name, requestCategoryType, createdByUserId, tenantId);
                 if (response.Data == null)
                 {
-                    response.SetError("An unexpected error occurred while saving the Category object");
+                    response.SetError($"An unexpected error occurred while saving the {requestCategoryType} object");
                 }
             }
             catch (Exception ex)
@@ -82,7 +86,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> ProcessUpdateRequestAsync(int id, CategoryModel model, int modifiedByUserId)
+        public async Task<ServiceResponse> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryModel model, int modifiedByUserId)
         {
             var response = new ServiceResponse();
 
@@ -90,17 +94,17 @@ namespace Api.Services
             {
                 // Fetch the existing object
                 var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
-                if (category != null)
+                if (category != null && category.Type == requestCategoryType)
                 {
                     // Try to update and set response
                     if (!await _categoryEntityService.UpdateAsync(category, model.Name, modifiedByUserId))
                     {
-                        response.SetError("An unexpected error occurred while saving the Category object");
+                        response.SetError($"An unexpected error occurred while saving the {requestCategoryType} object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound($"Unable to locate Category object ({id})");
+                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
                 }
             }
             catch (Exception ex)
@@ -113,7 +117,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ServiceResponse> ProcessDeleteRequestAsync(int id, int deletedByUserId)
+        public async Task<ServiceResponse> ProcessDeleteRequestAsync(CategoryType requestCategoryType, int id, int deletedByUserId)
         {
             var response = new ServiceResponse();
 
@@ -121,17 +125,17 @@ namespace Api.Services
             {
                 // Fetch the existing object
                 var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
-                if (category != null)
+                if (category != null && category.Type == requestCategoryType)
                 {
                     // Try to update and set response
                     if (!await _categoryEntityService.DeleteAsync(category, deletedByUserId))
                     {
-                        response.SetError("An unexpected error occurred while removing the Category object");
+                        response.SetError($"An unexpected error occurred while removing the {requestCategoryType} object");
                     }
                 }
                 else
                 {
-                    response.SetNotFound($"Unable to locate Category object ({id})");
+                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
                 }
             }
             catch (Exception ex)
