@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Api.Models.Dto;
+using AutoMapper;
 using Data.Models;
 
 namespace Api.Models.MapProfiles

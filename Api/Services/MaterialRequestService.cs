@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using Api.Models.Dto;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ namespace Api.Services
     {
         private readonly ILogger<MaterialRequestService> _logger;
         private readonly MaterialEntityService _materialEntityService;
-
         public MaterialRequestService(
             ILogger<MaterialRequestService> logger,
             MaterialEntityService materialEntityService)

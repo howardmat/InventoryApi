@@ -8,6 +8,7 @@ namespace Data
         public ICategoryRepository CategoryRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IMaterialRepository MaterialRepository { get; }
+        public IMaterialInventoryTransactionRepository MaterialInventoryTransactionRepository { get; }
         public IProvinceRepository ProvinceRepository { get; }
         public ITenantRepository TenantRepository { get; }
         public IUnitOfMeasurementRepository UnitOfMeasurementRepository { get; }
@@ -22,6 +23,7 @@ namespace Data
             CategoryRepository = new CategoryRepository(_context);
             CountryRepository = new CountryRepository(_context);
             MaterialRepository = new MaterialRepository(_context);
+            MaterialInventoryTransactionRepository = new MaterialInventoryTransactionRepository(_context);
             ProvinceRepository = new ProvinceRepository(_context);
             TenantRepository = new TenantRepository(_context);
             UnitOfMeasurementRepository = new UnitOfMeasurementRepository(_context);

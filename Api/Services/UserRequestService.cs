@@ -1,4 +1,5 @@
 ﻿using Api.Models;
+using Api.Models.Dto;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;

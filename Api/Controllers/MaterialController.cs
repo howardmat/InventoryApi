@@ -1,4 +1,4 @@
-﻿using Api.Models;
+﻿using Api.Models.Dto;
 using Api.Services;
 using Api.Validation.Validators;
 using Data.Enums;

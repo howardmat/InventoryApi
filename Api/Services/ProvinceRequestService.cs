@@ -1,6 +1,5 @@
 ﻿using Api.Models;
-using AutoMapper;
-using Data;
+using Api.Models.Dto;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

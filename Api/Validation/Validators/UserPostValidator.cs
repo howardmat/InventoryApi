@@ -1,4 +1,4 @@
-﻿using Api.Models;
+﻿using Api.Models.Dto;
 using Data;
 using System.Threading.Tasks;
 

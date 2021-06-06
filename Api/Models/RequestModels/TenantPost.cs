@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Api.Models.Dto;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Models.RequestModels
 {

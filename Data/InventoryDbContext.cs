@@ -64,6 +64,11 @@ namespace Data
             {
                 e.Property(f => f.AmountPaid).HasPrecision(19, 4);
                 e.Property(f => f.Quantity).HasPrecision(19, 4);
+
+                e.HasOne(m => m.Tenant)
+                    .WithMany()
+                    .HasForeignKey(m => m.TenantId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<Product>(e =>

@@ -1,4 +1,4 @@
-﻿using Api.Models;
+﻿using Api.Models.Dto;
 using Data;
 using Data.Enums;
 using System.Threading.Tasks;

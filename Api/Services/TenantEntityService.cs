@@ -1,5 +1,5 @@
 ﻿using Api.Extensions;
-using Api.Models;
+using Api.Models.Dto;
 using AutoMapper;
 using Data;
 using Data.Models;
