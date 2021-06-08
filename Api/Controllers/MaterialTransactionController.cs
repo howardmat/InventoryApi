@@ -1,0 +1,60 @@
+﻿using Api.Models.Dto;
+using Api.Services;
+using Api.Validation.Validators;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Api.Controllers
+{
+    [Authorize]
+    [Route("api/material/inventory")]
+    [ApiController]
+    public class MaterialTransactionController : InventoryControllerBase
+    {
+        private readonly MaterialTransactionRequestService _materialTransactionRequestService;
+
+        public MaterialTransactionController(
+            MaterialTransactionRequestService materialTransactionRequestService,
+            AuthenticationDetailService authDetailService) : base(authDetailService)
+        {
+            _materialTransactionRequestService = materialTransactionRequestService;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MaterialInventoryTransactionModel>> Get(int id)
+        {
+            var result = await _materialTransactionRequestService.ProcessGetRequestAsync(id);
+            return GetResultFromServiceResponse(result);
+        }
+
+        [HttpGet]
+        [Route("api/material/{materialId}/inventory")]
+        public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
+        {
+            var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId);
+            return GetResultFromServiceResponse(result);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<MaterialInventoryTransactionModel>> Post(MaterialInventoryTransactionModel model)
+        {
+            var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _materialTransactionRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
+            return GetResultFromServiceResponse(result,
+                Url.Action("Get", "MaterialTransaction", new { id = result.Data?.Id }));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var userId = await GetCurrentUserIdAsync(User);
+
+            var result = await _materialTransactionRequestService.ProcessDeleteRequestAsync(id, userId);
+            return GetResultFromServiceResponse(result);
+        }
+    }
+}
