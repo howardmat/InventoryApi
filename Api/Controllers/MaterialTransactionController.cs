@@ -1,6 +1,5 @@
 ﻿using Api.Models.Dto;
 using Api.Services;
-using Api.Validation.Validators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -30,7 +29,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        [Route("api/material/{materialId}/inventory")]
+        [Route("/api/material/{materialId}/inventory")]
         public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
         {
             var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId);

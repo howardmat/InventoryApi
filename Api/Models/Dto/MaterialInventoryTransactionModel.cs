@@ -6,6 +6,7 @@ namespace Api.Models.Dto
     {
         public int? Id { get; set; }
 
+        [Required]
         public int? MaterialId { get; set; }
 
         [Required]

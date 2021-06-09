@@ -1,4 +1,5 @@
 using Api.Claims;
+using Api.Extensions;
 using Api.Models.MapProfiles;
 using Api.Services;
 using Api.Validation.Validators;
@@ -18,14 +19,16 @@ namespace Api
     public class Startup
     {
         private IConfiguration _configuration;
+        private string _firebaseApiUrl;
         private string _firebaseProjectId;
         private string _secureTokenUrl;
 
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
+            _firebaseApiUrl = _configuration["Firebase:ApiUrl"];
             _firebaseProjectId = _configuration["Firebase:ProjectId"];
-            _secureTokenUrl = $"https://securetoken.google.com/{_firebaseProjectId}";
+            _secureTokenUrl = $"{_firebaseApiUrl}/{_firebaseProjectId}";
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -34,7 +37,7 @@ namespace Api
                 options.UseSqlServer(
                     _configuration.GetConnectionString("DefaultConnection")));
 
-            AddAutoMapperWithProfiles(services);
+            services.AddInventoryProfilesForAutoMapper();
 
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -57,7 +60,11 @@ namespace Api
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Api", Version = "v1" });
             });
 
-            AddApplicationServices(services);
+            services.AddInventoryUnitOfWork();
+
+            services.AddInventoryApplicationServices();
+
+            services.AddInventoryValidators();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -83,48 +90,6 @@ namespace Api
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private void AddApplicationServices(IServiceCollection services)
-        {
-            services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
-
-            services.AddTransient<AuthenticationDetailService>();
-            services.AddTransient<CategoryEntityService>();
-            services.AddTransient<CategoryRequestService>();
-            services.AddTransient<CountryEntityService>();
-            services.AddTransient<CountryRequestService>();
-            services.AddTransient<MaterialEntityService>();
-            services.AddTransient<MaterialRequestService>();
-            services.AddTransient<ProvinceEntityService>();
-            services.AddTransient<ProvinceRequestService>();
-            services.AddTransient<RegisterUserRequestService>();
-            services.AddTransient<RegisterCompanyRequestService>();
-            services.AddTransient<TenantEntityService>();
-            services.AddTransient<TenantRequestService>();
-            services.AddTransient<UnitOfMeasurementEntityService>();
-            services.AddTransient<UnitOfMeasurementRequestService>();
-            services.AddTransient<UserEntityService>();
-            services.AddTransient<UserRequestService>();
-
-            services.AddTransient<UserPostValidator>();
-            services.AddTransient<MaterialRequestValidator>();
-            services.AddTransient<RegisterUserPostValidator>();
-            services.AddTransient<RegisterCompanyPostValidator>();
-            services.AddTransient<TenantPostValidator>();
-        }
-
-        private void AddAutoMapperWithProfiles(IServiceCollection services)
-        {
-            services.AddAutoMapper(
-                typeof(AddressProfile),
-                typeof(CategoryProfile),
-                typeof(CountryProfile),
-                typeof(MaterialProfile),
-                typeof(ProvinceProfile),
-                typeof(TenantProfile),
-                typeof(UnitOfMeasurementProfile),
-                typeof(UserProfile));
         }
     }
 }
