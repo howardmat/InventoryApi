@@ -1,7 +1,6 @@
 ﻿using Api.Models.Dto;
 using Api.Services;
 using Api.Validation.Validators;
-using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -10,12 +9,10 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/material")]
+    [Route("/material")]
     [ApiController]
     public class MaterialController : InventoryControllerBase
     {
-        private const CategoryType CATEGORY_TYPE = CategoryType.Material;
-
         private readonly MaterialRequestService _materialRequestService;
         private readonly MaterialRequestValidator _materialRequestValidator;
 
@@ -45,7 +42,7 @@ namespace Api.Controllers
         [HttpPost]
         public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
         {
-            if (!await _materialRequestValidator.IsValidAsync(model, CATEGORY_TYPE))
+            if (!await _materialRequestValidator.IsValidAsync(model))
                 return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
 
             var userId = await GetCurrentUserIdAsync(User);
@@ -59,7 +56,7 @@ namespace Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, MaterialModel model)
         {
-            if (!await _materialRequestValidator.IsValidAsync(model, CATEGORY_TYPE))
+            if (!await _materialRequestValidator.IsValidAsync(model))
                 return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
 
             var userId = await GetCurrentUserIdAsync(User);

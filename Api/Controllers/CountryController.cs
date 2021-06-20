@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/country")]
+    [Route("/country")]
     [ApiController]
     public class CountryController : InventoryControllerBase
     {

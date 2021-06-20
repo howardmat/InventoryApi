@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/material/inventory")]
+    [Route("/material/inventory")]
     [ApiController]
     public class MaterialTransactionController : InventoryControllerBase
     {
@@ -29,7 +29,7 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        [Route("/api/material/{materialId}/inventory")]
+        [Route("/material/{materialId}/inventory")]
         public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
         {
             var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId);

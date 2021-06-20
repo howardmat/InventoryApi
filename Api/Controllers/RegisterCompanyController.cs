@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
-    [Route("api/register/companyprofile")]
+    [Route("/register/companyprofile")]
     [ApiController]
     public class RegisterCompanyController : InventoryControllerBase
     {

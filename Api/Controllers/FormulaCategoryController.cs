@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/formula/category")]
+    [Route("/formula/category")]
     [ApiController]
     public class FormulaCategoryController : InventoryControllerBase
     {

@@ -20,14 +20,14 @@ namespace Api.Controllers
             _provinceService = provinceService;
         }
 
-        [HttpGet("api/country/{countryIsoCode}/province")]
+        [HttpGet("/country/{countryIsoCode}/province")]
         public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry([FromRoute] ProvinceGetAllByCountry model)
         {
             var result = await _provinceService.ProcessListRequestAsync(model.CountryIsoCode);
             return GetResultFromServiceResponse(result);
         }
 
-        [HttpGet("api/country/{countryIsoCode}/province/{isoCode}")]
+        [HttpGet("/country/{countryIsoCode}/province/{isoCode}")]
         public async Task<ActionResult<ProvinceModel>> GetByCode([FromRoute] ProvinceGetByCode model)
         {
             var result = await _provinceService.ProcessGetRequestAsync(model.IsoCode);

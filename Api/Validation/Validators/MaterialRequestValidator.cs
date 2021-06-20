@@ -7,6 +7,8 @@ namespace Api.Validation.Validators
 {
     public class MaterialRequestValidator : InventoryValidatorAsyncBase<MaterialModel>
     {
+        private const CategoryType CATEGORY_TYPE = CategoryType.Material;
+
         private readonly IUnitOfWork _unitOfWork;
 
         public MaterialRequestValidator(
@@ -15,17 +17,12 @@ namespace Api.Validation.Validators
             _unitOfWork = unitOfWork;
         }
 
-        public override async Task<bool> IsValidAsync(MaterialModel model) 
-        {
-            return false;
-        }
-
-        public async Task<bool> IsValidAsync(MaterialModel model, CategoryType categoryType)
+        public override async Task<bool> IsValidAsync(MaterialModel model)
         {
             var isValid = true;
 
             var category = await _unitOfWork.CategoryRepository.GetAsync(model.CategoryId.Value);
-            if (category == null || category.Type != categoryType)
+            if (category == null || category.Type != CATEGORY_TYPE)
             {
                 isValid = false;
                 ServiceResponse.SetError("A valid Material Category could not be found with the CategoryId");

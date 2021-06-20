@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace Api.Controllers
 {
     [Authorize]
-    [Route("api/tenant")]
+    [Route("/tenant")]
     [ApiController]
     public class TenantController : InventoryControllerBase
     {
