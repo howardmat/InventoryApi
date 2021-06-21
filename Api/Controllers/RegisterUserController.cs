@@ -26,10 +26,10 @@ namespace Api.Controllers
         public async Task<ActionResult<UserModel>> Post(RegisterUserPost model)
         {
             if (!await _registerPostValidator.IsValidAsync(model))
-                return GetResultFromServiceResponse(_registerPostValidator.ServiceResponse);
+                return _registerPostValidator.ServiceResponse.ToActionResult();
 
             var result = await _registerRequestService.ProcessRegisterRequestAsync(model);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "User", new { id = result.Data?.Id }));
         }
     }

@@ -29,27 +29,27 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<MaterialModel>>> Get()
         {
             var result = await _materialRequestService.ProcessListRequestAsync();
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<MaterialModel>> Get(int id)
         {
             var result = await _materialRequestService.ProcessGetRequestAsync(id);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpPost]
         public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
         {
             if (!await _materialRequestValidator.IsValidAsync(model))
-                return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
+                return _materialRequestValidator.ServiceResponse.ToActionResult();
 
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
             var result = await _materialRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "Material", new { id = result.Data?.Id }));
         }
 
@@ -57,12 +57,12 @@ namespace Api.Controllers
         public async Task<IActionResult> Put(int id, MaterialModel model)
         {
             if (!await _materialRequestValidator.IsValidAsync(model))
-                return GetResultFromServiceResponse(_materialRequestValidator.ServiceResponse);
+                return _materialRequestValidator.ServiceResponse.ToActionResult();
 
             var userId = await GetCurrentUserIdAsync(User);
 
             var result = await _materialRequestService.ProcessUpdateRequestAsync(id, model, userId);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpDelete("{id}")]
@@ -71,7 +71,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
 
             var result = await _materialRequestService.ProcessDeleteRequestAsync(id, userId);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
     }
 }

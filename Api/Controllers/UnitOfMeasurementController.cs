@@ -24,14 +24,14 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
         {
             var result = await _unitOfMeasurementService.ProcessListRequestAsync();
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
         {
             var result = await _unitOfMeasurementService.ProcessGetRequestAsync(id);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
     }
 }

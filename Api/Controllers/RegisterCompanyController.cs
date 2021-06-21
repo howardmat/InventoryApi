@@ -28,10 +28,10 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
 
             if (!await _registerCompanyPostValidator.IsValidAsync(userId))
-                return GetResultFromServiceResponse(_registerCompanyPostValidator.ServiceResponse);
+                return _registerCompanyPostValidator.ServiceResponse.ToActionResult();
 
             var result = await _registerCompanyRequestService.ProcessRegisterRequestAsync(model, userId);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "Tenant", new { id = result.Data?.Id }));
         }
     }

@@ -25,7 +25,7 @@ namespace Api.Controllers
         public async Task<ActionResult<MaterialInventoryTransactionModel>> Get(int id)
         {
             var result = await _materialTransactionRequestService.ProcessGetRequestAsync(id);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpGet]
@@ -33,7 +33,7 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
         {
             var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpPost]
@@ -43,7 +43,7 @@ namespace Api.Controllers
             var tenantId = GetCurrentTenantId(User);
 
             var result = await _materialTransactionRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "MaterialTransaction", new { id = result.Data?.Id }));
         }
 
@@ -53,7 +53,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
 
             var result = await _materialTransactionRequestService.ProcessDeleteRequestAsync(id, userId);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
     }
 }

@@ -28,19 +28,19 @@ namespace Api.Controllers
         public async Task<ActionResult<UserModel>> Get(int id)
         {
             var result = await _userRequestService.ProcessGetRequestAsync(id);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpPost]
         public async Task<ActionResult<UserModel>> Post(UserModel model)
         {
-            if (!await _userPostValidator.IsValidAsync(model)) 
-                return GetResultFromServiceResponse(_userPostValidator.ServiceResponse);
+            if (!await _userPostValidator.IsValidAsync(model))
+                return _userPostValidator.ServiceResponse.ToActionResult();
 
             var userId = await GetCurrentUserIdAsync(User);
 
             var result = await _userRequestService.ProcessCreateRequestAsync(model, userId);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "User", new { id = result.Data?.Id }));
         }
     }

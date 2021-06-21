@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Models
 {
@@ -91,6 +93,35 @@ namespace Api.Models
         {
             return JsonSerializer.Serialize(_errors);
         }
+
+        public ActionResult ToActionResult()
+        {
+            ActionResult result;
+
+            // Handle the status result
+            var responseStatus = GetStatus();
+            switch (responseStatus)
+            {
+                case ServiceResponseStatus.Success:
+                    result = new NoContentResult();
+                    break;
+                case ServiceResponseStatus.NotFound:
+                    result = new NotFoundObjectResult(GetErrorJson());
+                    break;
+                case ServiceResponseStatus.Error:
+                    result = new BadRequestObjectResult(GetErrorJson());
+                    break;
+                case ServiceResponseStatus.Exception:
+                    result = new ObjectResult(GetErrorJson());
+                    ((ObjectResult)result).StatusCode = StatusCodes.Status500InternalServerError;
+                    break;
+                default:
+                    result = new StatusCodeResult(StatusCodes.Status500InternalServerError);
+                    break;
+            }
+
+            return result;
+        }
     }
 
     public class ServiceResponse<T> : ServiceResponse
@@ -100,6 +131,38 @@ namespace Api.Models
         public ServiceResponse ToNonGeneric()
         {
             return new ServiceResponse(GetStatus(), GetErrors());
+        }
+
+        public ActionResult<T> ToActionResult(string uri = null)
+        {
+            ActionResult<T> result;
+
+            // Handle the generic result
+            var responseStatus = GetStatus();
+            if (responseStatus == ServiceResponseStatus.Success)
+            {
+                if (Data != null)
+                {
+                    if (!string.IsNullOrEmpty(uri))
+                    {
+                        result = new CreatedResult(uri, Data);
+                    }
+                    else
+                    {
+                        result = new OkObjectResult(Data);
+                    }
+                }
+                else
+                {
+                    result = new NoContentResult();
+                }
+            }
+            else
+            {
+                result = base.ToActionResult();
+            }
+
+            return result;
         }
     }
 }

@@ -24,14 +24,14 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry([FromRoute] ProvinceGetAllByCountry model)
         {
             var result = await _provinceService.ProcessListRequestAsync(model.CountryIsoCode);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpGet("/country/{countryIsoCode}/province/{isoCode}")]
         public async Task<ActionResult<ProvinceModel>> GetByCode([FromRoute] ProvinceGetByCode model)
         {
             var result = await _provinceService.ProcessGetRequestAsync(model.IsoCode);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
     }
 }

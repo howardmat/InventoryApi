@@ -29,17 +29,17 @@ namespace Api.Controllers
         public async Task<ActionResult<TenantModel>> Get(int id)
         {
             var result = await _tenantRequestService.ProcessGetRequestAsync(id);
-            return GetResultFromServiceResponse(result);
+            return result.ToActionResult();
         }
 
         [HttpPost]
         public async Task<ActionResult<TenantModel>> Post(TenantPost model)
         {
             if (!await _tenantPostValidator.IsValidAsync(model))
-                return GetResultFromServiceResponse(_tenantPostValidator.ServiceResponse);
+                return _tenantPostValidator.ServiceResponse.ToActionResult();
 
             var result = await _tenantRequestService.ProcessCreateRequestAsync(model, model.OwnerUserId.Value);
-            return GetResultFromServiceResponse(result,
+            return result.ToActionResult(
                 Url.Action("Get", "Tenant", new { id = result.Data?.Id }));
         }
     }
