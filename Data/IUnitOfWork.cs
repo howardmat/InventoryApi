@@ -10,6 +10,7 @@ namespace Data
         ICountryRepository CountryRepository { get; }
         IMaterialRepository MaterialRepository { get; }
         IMaterialInventoryTransactionRepository MaterialInventoryTransactionRepository { get; }
+        IProductRepository ProductRepository { get; }
         IProvinceRepository ProvinceRepository { get; }
         ITenantRepository TenantRepository { get; }
         IUnitOfMeasurementRepository UnitOfMeasurementRepository { get; }
