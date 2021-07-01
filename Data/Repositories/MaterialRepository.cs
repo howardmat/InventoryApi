@@ -13,19 +13,19 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<Material>> ListAsync()
         {
-            return await (from u in _context.Material
-                          orderby u.Name
-                          where !u.DeletedUtc.HasValue
-                          select u)
+            return await (from m in _context.Material
+                          orderby m.Name
+                          where !m.DeletedUtc.HasValue
+                          select m)
                         .ToListAsync();
         }
 
         public async Task<Material> GetAsync(int id)
         {
-            return await (from u in _context.Material
-                          where u.Id == id
-                            && !u.DeletedUtc.HasValue
-                          select u)
+            return await (from m in _context.Material
+                          where m.Id == id
+                            && !m.DeletedUtc.HasValue
+                          select m)
                         .FirstOrDefaultAsync();
         }
     }

@@ -1,0 +1,121 @@
+﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
+using AutoMapper;
+using Data;
+using Data.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace Api.Services
+{
+    public class FormulaEntityService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+
+        public FormulaEntityService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
+        {
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+        }
+
+        public async Task<IEnumerable<FormulaModel>> ListAsync()
+        {
+            // Fetch data
+            var data = await _unitOfWork.FormulaRepository.ListAsync();
+
+            // Add to collection
+            var list = new List<FormulaModel>();
+            foreach (var item in data)
+            {
+                list.Add(_mapper.Map<FormulaModel>(item));
+            }
+
+            return list;
+        }
+
+        public async Task<Formula> GetEntityOrDefaultAsync(int id)
+        {
+            // Fetch object
+            var entity = await _unitOfWork.FormulaRepository.GetAsync(id);
+
+            return entity;
+        }
+
+        public async Task<FormulaModel> GetModelOrDefaultAsync(int id)
+        {
+            FormulaModel model = null;
+
+            // Fetch object
+            var formula = await _unitOfWork.FormulaRepository.GetAsync(id);
+
+            // Set response
+            if (formula != null)
+            {
+                model = _mapper.Map<FormulaModel>(formula);
+            }
+
+            return model;
+        }
+
+        public async Task<FormulaModel> CreateAsync(FormulaRequest model, int modifyingUserId, int tenantId)
+        {
+            FormulaModel newModel = null;
+
+            var now = DateTime.UtcNow;
+
+            // Build and add the new object
+            var formula = new Formula
+            {
+                Name = model.Name,
+                CategoryId = model.CategoryId.Value,
+                Description = model.Description,
+                CreatedUserId = modifyingUserId,
+                LastModifiedUserId = modifyingUserId,
+                TenantId = tenantId,
+                CreatedUtc = now,
+                LastModifiedUtc = now
+            };
+            await _unitOfWork.FormulaRepository.AddAsync(formula);
+
+            // Set response
+            if (await _unitOfWork.CompleteAsync() > 0)
+            {
+                newModel = _mapper.Map<FormulaModel>(formula);
+            }
+
+            return newModel;
+        }
+
+        public async Task<bool> UpdateAsync(Formula formula, FormulaRequest model, int modifyingUserId)
+        {
+            // Update properties
+            formula.Name = model.Name;
+            formula.CategoryId = model.CategoryId.Value;
+            formula.Description = model.Description;
+            formula.LastModifiedUserId = modifyingUserId;
+            formula.LastModifiedUtc = DateTime.UtcNow;
+
+            // Set response
+            var success = await _unitOfWork.CompleteAsync() > 0;
+
+            return success;
+        }
+
+        public async Task<bool> DeleteAsync(Formula formula, int modifyingUserId)
+        {
+            var now = DateTime.UtcNow;
+
+            // Update entity
+            formula.DeletedUserId = modifyingUserId;
+            formula.DeletedUtc = now;
+
+            var success = await _unitOfWork.CompleteAsync() > 0;
+
+            return success;
+        }
+    }
+}

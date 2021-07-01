@@ -9,13 +9,13 @@ namespace Data
         public DbSet<Address> Address { get; set; }
         public DbSet<Category> Category { get; set; }
         public DbSet<Country> Country { get; set; }
+        public DbSet<Formula> Formula { get; set; }
+        public DbSet<FormulaIngredient> FormulaIngredient { get; set; }
         public DbSet<Material> Material { get; set; }
         public DbSet<MaterialInventoryTransaction> MaterialInventoryTransaction { get; set; }
         public DbSet<Product> Product { get; set; }
         public DbSet<ProductInventoryTransaction> ProductInventoryTransaction { get; set; }
         public DbSet<Province> Province { get; set; }
-        public DbSet<Formula> Formula { get; set; }
-        public DbSet<FormulaIngredient> FormulaIngredient { get; set; }
         public DbSet<Tenant> Tenant { get; set; }
         public DbSet<UnitOfMeasurement> UnitOfMeasurement { get; set; }
         public DbSet<UserProfile> UserProfile { get; set; }

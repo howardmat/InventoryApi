@@ -23,6 +23,9 @@ namespace Api.Extensions
             services.AddTransient<CountryEntityService>();
             services.AddTransient<CountryRequestService>();
 
+            services.AddTransient<FormulaEntityService>();
+            services.AddTransient<FormulaRequestService>();
+
             services.AddTransient<MaterialEntityService>();
             services.AddTransient<MaterialInventoryTransactionService>();
             services.AddTransient<MaterialRequestService>();
@@ -62,7 +65,9 @@ namespace Api.Extensions
                 typeof(AddressProfile),
                 typeof(CategoryProfile),
                 typeof(CountryProfile),
+                typeof(FormulaProfile),
                 typeof(MaterialProfile),
+                typeof(ProductProfile),
                 typeof(ProvinceProfile),
                 typeof(TenantProfile),
                 typeof(UnitOfMeasurementProfile),
