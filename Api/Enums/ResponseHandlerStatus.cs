@@ -1,6 +1,6 @@
 ﻿namespace Api.Enums
 {
-    public enum ServiceResponseStatus
+    public enum ResponseHandlerStatus
     {
         Success,
         Error,

@@ -1,8 +1,6 @@
-﻿using Api.Models;
+﻿using Api.Handlers;
 using Api.Models.Dto;
 using Data.Enums;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,140 +8,92 @@ namespace Api.Services
 {
     public class CategoryRequestService
     {
-        private readonly ILogger<CategoryRequestService> _logger;
         private readonly CategoryEntityService _categoryEntityService;
 
         public CategoryRequestService(
-            ILogger<CategoryRequestService> logger,
             CategoryEntityService categoryEntityService)
         {
-            _logger = logger;
             _categoryEntityService = categoryEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<CategoryModel>>> ProcessListRequestAsync(CategoryType categoryType)
+        public async Task<ResponseHandler<IEnumerable<CategoryModel>>> ProcessListRequestAsync(CategoryType categoryType)
         {
-            var response = new ServiceResponse<IEnumerable<CategoryModel>>();
+            var response = new ResponseHandler<IEnumerable<CategoryModel>>();
 
-            try
+            response.Data = await _categoryEntityService.ListAsync(categoryType);
+
+            return response;
+        }
+
+        public async Task<ResponseHandler<CategoryModel>> ProcessGetRequestAsync(CategoryType requestCategoryType, int id)
+        {
+            var response = new ResponseHandler<CategoryModel>();
+
+            var category = await _categoryEntityService.GetModelOrDefaultAsync(requestCategoryType, id);
+            if (category != null)
             {
-                response.Data = await _categoryEntityService.ListAsync(categoryType);
+                response.Data = category;
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("CategoryRequestService.GetResponseForGetRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> ProcessGetRequestAsync(CategoryType requestCategoryType, int id)
+        public async Task<ResponseHandler<CategoryModel>> ProcessCreateRequestAsync(CategoryType requestCategoryType, CategoryModel model, int createdByUserId, int tenantId)
         {
-            var response = new ServiceResponse<CategoryModel>();
+            var response = new ResponseHandler<CategoryModel>();
 
-            try
+            response.Data = await _categoryEntityService.CreateAsync(model.Name, requestCategoryType, createdByUserId, tenantId);
+            if (response.Data == null)
             {
-                var category = await _categoryEntityService.GetModelOrDefaultAsync(requestCategoryType, id);
-                if (category != null)
-                {
-                    response.Data = category;
-                }
-                else
-                {
-                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("CategoryRequestService.GetResponseForGetRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetError($"An unexpected error occurred while saving the {requestCategoryType} object");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<CategoryModel>> ProcessCreateRequestAsync(CategoryType requestCategoryType, CategoryModel model, int createdByUserId, int tenantId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryModel model, int modifiedByUserId)
         {
-            var response = new ServiceResponse<CategoryModel>();
+            var response = new ResponseHandler();
 
-            try
+            // Fetch the existing object
+            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
+            if (category != null && category.Type == requestCategoryType)
             {
-                response.Data = await _categoryEntityService.CreateAsync(model.Name, requestCategoryType, createdByUserId, tenantId);
-                if (response.Data == null)
+                // Try to update and set response
+                if (!await _categoryEntityService.UpdateAsync(category, model.Name, modifiedByUserId))
                 {
                     response.SetError($"An unexpected error occurred while saving the {requestCategoryType} object");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("CategoryRequestService.GetResponseForCreateRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryModel model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(CategoryType requestCategoryType, int id, int deletedByUserId)
         {
-            var response = new ServiceResponse();
+            var response = new ResponseHandler();
 
-            try
+            // Fetch the existing object
+            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
+            if (category != null && category.Type == requestCategoryType)
             {
-                // Fetch the existing object
-                var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
-                if (category != null && category.Type == requestCategoryType)
+                // Try to update and set response
+                if (!await _categoryEntityService.DeleteAsync(category, deletedByUserId))
                 {
-                    // Try to update and set response
-                    if (!await _categoryEntityService.UpdateAsync(category, model.Name, modifiedByUserId))
-                    {
-                        response.SetError($"An unexpected error occurred while saving the {requestCategoryType} object");
-                    }
-                }
-                else
-                {
-                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
+                    response.SetError($"An unexpected error occurred while removing the {requestCategoryType} object");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("CategoryRequestService.GetResponseForUpdateRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
-            }
-
-            return response;
-        }
-
-        public async Task<ServiceResponse> ProcessDeleteRequestAsync(CategoryType requestCategoryType, int id, int deletedByUserId)
-        {
-            var response = new ServiceResponse();
-
-            try
-            {
-                // Fetch the existing object
-                var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
-                if (category != null && category.Type == requestCategoryType)
-                {
-                    // Try to update and set response
-                    if (!await _categoryEntityService.DeleteAsync(category, deletedByUserId))
-                    {
-                        response.SetError($"An unexpected error occurred while removing the {requestCategoryType} object");
-                    }
-                }
-                else
-                {
-                    response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("CategoryRequestService.GetResponseForDeleteRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetNotFound($"Unable to locate {requestCategoryType} object ({id})");
             }
 
             return response;

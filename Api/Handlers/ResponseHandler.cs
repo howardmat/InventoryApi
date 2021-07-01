@@ -5,26 +5,26 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Models
+namespace Api.Handlers
 {
-    public class ServiceResponse
+    public class ResponseHandler
     {
-        private ServiceResponseStatus _status = ServiceResponseStatus.Success;
+        private ResponseHandlerStatus _status = ResponseHandlerStatus.Success;
         private ICollection<string> _errors = new HashSet<string>();
 
-        public ServiceResponse() { }
+        public ResponseHandler() { }
 
-        public ServiceResponse(ServiceResponseStatus status, ICollection<string> errors)
+        public ResponseHandler(ResponseHandlerStatus status, ICollection<string> errors)
         {
             _status = status;
             _errors = errors;
         }
 
-        public ServiceResponseStatus GetStatus() => _status;
+        public ResponseHandlerStatus GetStatus() => _status;
 
-        public ServiceResponseStatus SetError() 
+        public ResponseHandlerStatus SetError() 
         {
-            _status = ServiceResponseStatus.Error;
+            _status = ResponseHandlerStatus.Error;
 
             return _status;
         }
@@ -46,7 +46,7 @@ namespace Api.Models
 
         public void SetNotFound()
         {
-            _status = ServiceResponseStatus.NotFound;
+            _status = ResponseHandlerStatus.NotFound;
         }
 
         public void SetNotFound(string error)
@@ -66,7 +66,7 @@ namespace Api.Models
 
         public void SetException()
         {
-            _status = ServiceResponseStatus.Exception;
+            _status = ResponseHandlerStatus.Exception;
         }
 
         public void SetException(string error)
@@ -102,16 +102,16 @@ namespace Api.Models
             var responseStatus = GetStatus();
             switch (responseStatus)
             {
-                case ServiceResponseStatus.Success:
+                case ResponseHandlerStatus.Success:
                     result = new NoContentResult();
                     break;
-                case ServiceResponseStatus.NotFound:
+                case ResponseHandlerStatus.NotFound:
                     result = new NotFoundObjectResult(GetErrorJson());
                     break;
-                case ServiceResponseStatus.Error:
+                case ResponseHandlerStatus.Error:
                     result = new BadRequestObjectResult(GetErrorJson());
                     break;
-                case ServiceResponseStatus.Exception:
+                case ResponseHandlerStatus.Exception:
                     result = new ObjectResult(GetErrorJson());
                     ((ObjectResult)result).StatusCode = StatusCodes.Status500InternalServerError;
                     break;
@@ -124,13 +124,13 @@ namespace Api.Models
         }
     }
 
-    public class ServiceResponse<T> : ServiceResponse
+    public class ResponseHandler<T> : ResponseHandler
     {
         public T Data { get; set; }
 
-        public ServiceResponse ToNonGeneric()
+        public ResponseHandler ToNonGeneric()
         {
-            return new ServiceResponse(GetStatus(), GetErrors());
+            return new ResponseHandler(GetStatus(), GetErrors());
         }
 
         public ActionResult<T> ToActionResult(string uri = null)
@@ -139,7 +139,7 @@ namespace Api.Models
 
             // Handle the generic result
             var responseStatus = GetStatus();
-            if (responseStatus == ServiceResponseStatus.Success)
+            if (responseStatus == ResponseHandlerStatus.Success)
             {
                 if (Data != null)
                 {

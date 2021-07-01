@@ -1,42 +1,29 @@
-﻿using Api.Models;
+﻿using Api.Handlers;
 using Api.Models.Dto;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 
 namespace Api.Services
 {
     public class RegisterCompanyRequestService
     {
-        private readonly ILogger<RegisterCompanyRequestService> _logger;
         private readonly TenantEntityService _tenantEntityService;
 
         public RegisterCompanyRequestService(
-            ILogger<RegisterCompanyRequestService> logger,
             TenantEntityService tenantEntityService)
         {
-            _logger = logger;
             _tenantEntityService = tenantEntityService;
         }
 
-        public async Task<ServiceResponse<TenantModel>> ProcessRegisterRequestAsync(TenantModel model, int createdByUserId)
+        public async Task<ResponseHandler<TenantModel>> ProcessRegisterRequestAsync(TenantModel model, int createdByUserId)
         {
-            var response = new ServiceResponse<TenantModel>();
+            var response = new ResponseHandler<TenantModel>();
 
-            try
-            {
-                var assignCreatorAsOwner = true;
-                response.Data = await _tenantEntityService.CreateAsync(model, createdByUserId, assignCreatorAsOwner);
-                if (response.Data == null)
-                {
-                    response.SetError("An unexpected error occurred while registering the Company");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("RegisterCompanyRequestService.ProcessRegisterRequestAsync - exception:{@Exception}", ex);
+            var assignCreatorAsOwner = true;
 
-                response.SetException();
+            response.Data = await _tenantEntityService.CreateAsync(model, createdByUserId, assignCreatorAsOwner);
+            if (response.Data == null)
+            {
+                response.SetError("An unexpected error occurred while registering the Company");
             }
 
             return response;

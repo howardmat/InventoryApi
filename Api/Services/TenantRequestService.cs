@@ -1,8 +1,6 @@
-﻿using Api.Models;
+﻿using Api.Handlers;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -10,141 +8,93 @@ namespace Api.Services
 {
     public class TenantRequestService
     {
-        private readonly ILogger<TenantRequestService> _logger;
         private readonly TenantEntityService _tenantEntityService;
 
         public TenantRequestService(
-            ILogger<TenantRequestService> logger,
             TenantEntityService tenantEntityService)
         {
-            _logger = logger;
             _tenantEntityService = tenantEntityService;
         }
 
-        public async Task<ServiceResponse<IEnumerable<TenantModel>>> ProcessListRequestAsync()
+        public async Task<ResponseHandler<IEnumerable<TenantModel>>> ProcessListRequestAsync()
         {
-            var response = new ServiceResponse<IEnumerable<TenantModel>>();
+            var response = new ResponseHandler<IEnumerable<TenantModel>>();
 
-            try
-            {
-                response.Data = await _tenantEntityService.ListAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("TenantRequestService.ProcessListRequestAsync - exception:{@Exception}", ex);
+            response.Data = await _tenantEntityService.ListAsync();
 
-                response.SetException();
+            return response;
+        }
+
+        public async Task<ResponseHandler<TenantModel>> ProcessGetRequestAsync(int id)
+        {
+            var response = new ResponseHandler<TenantModel>();
+
+            // Fetch object
+            response.Data = await _tenantEntityService.GetModelOrDefaultAsync(id);
+            if (response.Data == null)
+            {
+                response.SetNotFound($"Unable to locate Tenant object ({id})");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<TenantModel>> ProcessGetRequestAsync(int id)
+        public async Task<ResponseHandler<TenantModel>> ProcessCreateRequestAsync(TenantPost model, int createdByUserId)
         {
-            var response = new ServiceResponse<TenantModel>();
+            var response = new ResponseHandler<TenantModel>();
 
-            try
+            var tenantModel = new TenantModel
             {
-                // Fetch object
-                response.Data = await _tenantEntityService.GetModelOrDefaultAsync(id);
-                if (response.Data == null)
-                {
-                    response.SetNotFound($"Unable to locate Tenant object ({id})");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("TenantRequestService.ProcessGetRequestAsync - exception:{@Exception}", ex);
+                CompanyName = model.CompanyName,
+                PrimaryAddress = model.PrimaryAddress
+            };
 
-                response.SetException();
+            response.Data = await _tenantEntityService.CreateAsync(tenantModel, createdByUserId);
+            if (response.Data == null)
+            {
+                response.SetError("An unexpected error occurred while saving the Tenant object");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<TenantModel>> ProcessCreateRequestAsync(TenantPost model, int createdByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, TenantModel model, int modifiedByUserId)
         {
-            var response = new ServiceResponse<TenantModel>();
+            var response = new ResponseHandler();
 
-            try
+            // Fetch the existing object
+            var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
+            if (tenant != null)
             {
-                var tenantModel = new TenantModel
-                {
-                    CompanyName = model.CompanyName,
-                    PrimaryAddress = model.PrimaryAddress
-                };
-
-                response.Data = await _tenantEntityService.CreateAsync(tenantModel, createdByUserId);
-                if (response.Data == null)
+                if (!(await _tenantEntityService.UpdateAsync(tenant, model, modifiedByUserId)))
                 {
                     response.SetError("An unexpected error occurred while saving the Tenant object");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("TenantRequestService.ProcessCreateRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetNotFound($"Unable to locate Tenant object ({id})");
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse> ProcessUpdateRequestAsync(int id, TenantModel model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId)
         {
-            var response = new ServiceResponse();
+            var response = new ResponseHandler();
 
-            try
+            // Fetch the existing object
+            var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
+            if (tenant != null)
             {
-                // Fetch the existing object
-                var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
-                if (tenant != null)
+                if (!await _tenantEntityService.DeleteAsync(tenant, deletedByUserId))
                 {
-                    if (!(await _tenantEntityService.UpdateAsync(tenant, model, modifiedByUserId)))
-                    {
-                        response.SetError("An unexpected error occurred while saving the Tenant object");
-                    }
-                }
-                else
-                {
-                    response.SetNotFound($"Unable to locate Tenant object ({id})");
+                    response.SetError("An unexpected error occurred while removing the Tenant object");
                 }
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("TenantRequestService.ProcessUpdateRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
-            }
-
-            return response;
-        }
-
-        public async Task<ServiceResponse> ProcessDeleteRequestAsync(int id, int deletedByUserId)
-        {
-            var response = new ServiceResponse();
-
-            try
-            {
-                // Fetch the existing object
-                var tenant = await _tenantEntityService.GetEntityOrDefaultAsync(id);
-                if (tenant != null)
-                {
-                    if (!await _tenantEntityService.DeleteAsync(tenant, deletedByUserId))
-                    {
-                        response.SetError("An unexpected error occurred while removing the Tenant object");
-                    }
-                }
-                else
-                {
-                    response.SetNotFound($"Unable to locate Tenant object ({id})");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("TenantRequestService.ProcessDeleteRequestAsync - exception:{@Exception}", ex);
-
-                response.SetException();
+                response.SetNotFound($"Unable to locate Tenant object ({id})");
             }
 
             return response;
