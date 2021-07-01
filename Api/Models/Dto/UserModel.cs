@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Api.Models.Dto
+﻿namespace Api.Models.Dto
 {
     public class UserModel
     {
