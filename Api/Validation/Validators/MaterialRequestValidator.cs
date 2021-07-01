@@ -1,11 +1,11 @@
-﻿using Api.Models.Dto;
+﻿using Api.Models.RequestModels;
 using Data;
 using Data.Enums;
 using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public class MaterialRequestValidator : InventoryValidatorAsyncBase<MaterialModel>
+    public class MaterialRequestValidator : InventoryValidatorAsyncBase<MaterialRequest>
     {
         private const CategoryType CATEGORY_TYPE = CategoryType.Material;
 
@@ -17,7 +17,7 @@ namespace Api.Validation.Validators
             _unitOfWork = unitOfWork;
         }
 
-        public override async Task<bool> IsValidAsync(MaterialModel model)
+        public override async Task<bool> IsValidAsync(MaterialRequest model)
         {
             var isValid = true;
 

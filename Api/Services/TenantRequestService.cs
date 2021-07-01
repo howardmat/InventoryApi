@@ -39,17 +39,11 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<TenantModel>> ProcessCreateRequestAsync(TenantPost model, int createdByUserId)
+        public async Task<ResponseHandler<TenantModel>> ProcessCreateRequestAsync(TenantRequest model, int createdByUserId)
         {
             var response = new ResponseHandler<TenantModel>();
 
-            var tenantModel = new TenantModel
-            {
-                CompanyName = model.CompanyName,
-                PrimaryAddress = model.PrimaryAddress
-            };
-
-            response.Data = await _tenantEntityService.CreateAsync(tenantModel, createdByUserId);
+            response.Data = await _tenantEntityService.CreateAsync(model, createdByUserId);
             if (response.Data == null)
             {
                 response.SetError("An unexpected error occurred while saving the Tenant object");

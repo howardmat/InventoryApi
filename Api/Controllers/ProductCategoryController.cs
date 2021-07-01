@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
 using Api.Services;
 using Data.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +40,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CategoryModel>> Post(CategoryModel model)
+        public async Task<ActionResult<CategoryModel>> Post(CategoryRequest model)
         {
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
@@ -50,7 +51,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, CategoryModel model)
+        public async Task<IActionResult> Put(int id, CategoryRequest model)
         {
             var userId = await GetCurrentUserIdAsync(User);
 

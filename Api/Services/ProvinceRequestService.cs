@@ -24,11 +24,11 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<ProvinceModel>> ProcessGetRequestAsync(string provinceCode)
+        public async Task<ResponseHandler<ProvinceModel>> ProcessGetRequestAsync(string countryCode, string provinceCode)
         {
             var response = new ResponseHandler<ProvinceModel>();
 
-            response.Data = await _provinceEntityService.GetAsync(provinceCode);
+            response.Data = await _provinceEntityService.GetAsync(countryCode, provinceCode);
 
             return response;
         }

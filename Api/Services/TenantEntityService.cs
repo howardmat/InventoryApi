@@ -1,5 +1,6 @@
 ﻿using Api.Extensions;
 using Api.Models.Dto;
+using Api.Models.RequestModels;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -59,7 +60,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<TenantModel> CreateAsync(TenantModel model, int modifyingUserId, bool assignCreatorAsOwner = false)
+        public async Task<TenantModel> CreateAsync(TenantRequest model, int modifyingUserId, bool assignCreatorAsOwner = false)
         {
             TenantModel newModel = null;
 

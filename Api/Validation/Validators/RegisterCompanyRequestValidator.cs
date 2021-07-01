@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public class RegisterCompanyPostValidator : InventoryValidatorAsyncBase<int>
+    public class RegisterCompanyRequestValidator : InventoryValidatorAsyncBase<int>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public RegisterCompanyPostValidator(
+        public RegisterCompanyRequestValidator(
             IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;

@@ -15,7 +15,7 @@ namespace Api.Services
             _userEntityService = userEntityService;
         }
 
-        public async Task<ResponseHandler<UserModel>> ProcessRegisterRequestAsync(RegisterUserPost model)
+        public async Task<ResponseHandler<UserModel>> ProcessRegisterRequestAsync(RegisterUserRequest model)
         {
             var response = new ResponseHandler<UserModel>();
 

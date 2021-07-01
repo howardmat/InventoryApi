@@ -1,9 +1,8 @@
-﻿using Api.Models.Dto;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Api.Models.RequestModels
 {
-    public class TenantPost
+    public class TenantRequest
     {
         [MaxLength(255)]
         public string CompanyName { get; set; }
@@ -12,6 +11,6 @@ namespace Api.Models.RequestModels
         public int? OwnerUserId { get; set; }
 
         [Required]
-        public AddressModel PrimaryAddress { get; set; }
+        public AddressRequest PrimaryAddress { get; set; }
     }
 }

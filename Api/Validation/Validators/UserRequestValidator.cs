@@ -1,20 +1,20 @@
-﻿using Api.Models.Dto;
+﻿using Api.Models.RequestModels;
 using Data;
 using System.Threading.Tasks;
 
 namespace Api.Validation.Validators
 {
-    public class UserPostValidator : InventoryValidatorAsyncBase<UserModel>
+    public class UserRequestValidator : InventoryValidatorAsyncBase<UserRequest>
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public UserPostValidator(
+        public UserRequestValidator(
             IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        public override async Task<bool> IsValidAsync(UserModel item)
+        public override async Task<bool> IsValidAsync(UserRequest item)
         {
             var isValid = true;
 

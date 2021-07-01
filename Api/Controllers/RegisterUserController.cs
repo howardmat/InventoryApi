@@ -11,19 +11,19 @@ namespace Api.Controllers
     [ApiController]
     public class RegisterUserController : InventoryControllerBase
     {
-        private readonly RegisterUserPostValidator _registerPostValidator;
+        private readonly RegisterUserRequestValidator _registerPostValidator;
         private readonly RegisterUserRequestService _registerRequestService;
 
         public RegisterUserController(
             RegisterUserRequestService registerRequestService,
-            RegisterUserPostValidator registerPostValidator)
+            RegisterUserRequestValidator registerPostValidator)
         {
             _registerRequestService = registerRequestService;
             _registerPostValidator = registerPostValidator;
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserModel>> Post(RegisterUserPost model)
+        public async Task<ActionResult<UserModel>> Post(RegisterUserRequest model)
         {
             if (!await _registerPostValidator.IsValidAsync(model))
                 return _registerPostValidator.ServiceResponse.ToActionResult();

@@ -1,5 +1,6 @@
 ﻿using Api.Handlers;
 using Api.Models.Dto;
+using Api.Models.RequestModels;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -28,7 +29,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<UserModel>> ProcessCreateRequestAsync(UserModel model, int modifyingUserId)
+        public async Task<ResponseHandler<UserModel>> ProcessCreateRequestAsync(UserRequest model, int modifyingUserId)
         {
             var response = new ResponseHandler<UserModel>();
 

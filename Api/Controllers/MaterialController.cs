@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
 using Api.Services;
 using Api.Validation.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -40,7 +41,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MaterialModel>> Post(MaterialModel model)
+        public async Task<ActionResult<MaterialModel>> Post(MaterialRequest model)
         {
             if (!await _materialRequestValidator.IsValidAsync(model))
                 return _materialRequestValidator.ServiceResponse.ToActionResult();
@@ -54,7 +55,7 @@ namespace Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, MaterialModel model)
+        public async Task<IActionResult> Put(int id, MaterialRequest model)
         {
             if (!await _materialRequestValidator.IsValidAsync(model))
                 return _materialRequestValidator.ServiceResponse.ToActionResult();

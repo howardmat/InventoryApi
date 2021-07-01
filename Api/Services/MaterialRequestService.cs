@@ -1,5 +1,6 @@
 ﻿using Api.Handlers;
 using Api.Models.Dto;
+using Api.Models.RequestModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<MaterialModel>> ProcessCreateRequestAsync(MaterialModel model, int createdByUserId, int tenantId)
+        public async Task<ResponseHandler<MaterialModel>> ProcessCreateRequestAsync(MaterialRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<MaterialModel>();
 
@@ -49,7 +50,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, MaterialModel model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, MaterialRequest model, int modifiedByUserId)
         {
             var response = new ResponseHandler();
 

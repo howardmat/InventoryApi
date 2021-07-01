@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Api.Models.RequestModels;
 
 namespace Api.Controllers
 {
@@ -37,7 +38,7 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MaterialInventoryTransactionModel>> Post(MaterialInventoryTransactionModel model)
+        public async Task<ActionResult<MaterialInventoryTransactionModel>> Post(MaterialInventoryTransactionRequest model)
         {
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);

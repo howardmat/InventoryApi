@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -60,7 +61,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<MaterialModel> CreateAsync(MaterialModel model, int modifyingUserId, int tenantId)
+        public async Task<MaterialModel> CreateAsync(MaterialRequest model, int modifyingUserId, int tenantId)
         {
             MaterialModel newModel = null;
 
@@ -90,7 +91,7 @@ namespace Api.Services
             return newModel;
         }
 
-        public async Task<bool> UpdateAsync(Material material, MaterialModel model, int modifyingUserId)
+        public async Task<bool> UpdateAsync(Material material, MaterialRequest model, int modifyingUserId)
         {
             // Update properties
             material.Name = model.Name;

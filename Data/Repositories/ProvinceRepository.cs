@@ -11,10 +11,11 @@ namespace Data.Repositories
         public InventoryDbContext _context => Context as InventoryDbContext;
         public ProvinceRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<Province> GetAsync(string provinceCode)
+        public async Task<Province> GetAsync(string countryCode, string provinceCode)
         {
             return await (from p in _context.Province
-                          where p.IsoCode.ToLower() == provinceCode.ToLower()
+                          where p.CountryIsoCode.ToLower() == countryCode.ToLower()
+                            && p.IsoCode.ToLower() == provinceCode.ToLower()
                           select p)
                           .FirstOrDefaultAsync();
         }

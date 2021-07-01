@@ -52,11 +52,11 @@ namespace Api.Extensions
 
         public static void AddInventoryValidators(this IServiceCollection services)
         {
-            services.AddTransient<UserPostValidator>();
+            services.AddTransient<UserRequestValidator>();
             services.AddTransient<MaterialRequestValidator>();
-            services.AddTransient<RegisterUserPostValidator>();
-            services.AddTransient<RegisterCompanyPostValidator>();
-            services.AddTransient<TenantPostValidator>();
+            services.AddTransient<RegisterUserRequestValidator>();
+            services.AddTransient<RegisterCompanyRequestValidator>();
+            services.AddTransient<TenantRequestValidator>();
         }
 
         public static void AddInventoryProfilesForAutoMapper(this IServiceCollection services)

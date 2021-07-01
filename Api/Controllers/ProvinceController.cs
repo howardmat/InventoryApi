@@ -1,5 +1,4 @@
 ﻿using Api.Models.Dto;
-using Api.Models.RequestModels;
 using Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,16 +20,16 @@ namespace Api.Controllers
         }
 
         [HttpGet("/country/{countryIsoCode}/province")]
-        public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry([FromRoute] ProvinceGetAllByCountry model)
+        public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry(string countryIsoCode)
         {
-            var result = await _provinceService.ProcessListRequestAsync(model.CountryIsoCode);
+            var result = await _provinceService.ProcessListRequestAsync(countryIsoCode);
             return result.ToActionResult();
         }
 
         [HttpGet("/country/{countryIsoCode}/province/{isoCode}")]
-        public async Task<ActionResult<ProvinceModel>> GetByCode([FromRoute] ProvinceGetByCode model)
+        public async Task<ActionResult<ProvinceModel>> GetByCode(string countryIsoCode, string isoCode)
         {
-            var result = await _provinceService.ProcessGetRequestAsync(model.IsoCode);
+            var result = await _provinceService.ProcessGetRequestAsync(isoCode, countryIsoCode);
             return result.ToActionResult();
         }
     }

@@ -2,7 +2,7 @@
 
 namespace Api.Models.RequestModels
 {
-    public class RegisterUserPost
+    public class RegisterUserRequest
     {
         [Required]
         [MaxLength(1024)]

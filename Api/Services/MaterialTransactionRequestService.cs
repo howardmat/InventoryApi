@@ -1,5 +1,6 @@
 ﻿using Api.Handlers;
 using Api.Models.Dto;
+using Api.Models.RequestModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<MaterialInventoryTransactionModel>> ProcessCreateRequestAsync(MaterialInventoryTransactionModel model, int createdByUserId, int tenantId)
+        public async Task<ResponseHandler<MaterialInventoryTransactionModel>> ProcessCreateRequestAsync(MaterialInventoryTransactionRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<MaterialInventoryTransactionModel>();
 

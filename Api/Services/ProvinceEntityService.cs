@@ -34,10 +34,10 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<ProvinceModel> GetAsync(string provinceCode)
+        public async Task<ProvinceModel> GetAsync(string countryIsoCode, string provinceCode)
         {
             // Fetch data
-            var item = await _unitOfWork.ProvinceRepository.GetAsync(provinceCode);
+            var item = await _unitOfWork.ProvinceRepository.GetAsync(countryIsoCode, provinceCode);
             var model = _mapper.Map<ProvinceModel>(item);
 
             return model;

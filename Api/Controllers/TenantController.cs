@@ -14,15 +14,15 @@ namespace Api.Controllers
     public class TenantController : InventoryControllerBase
     {
         private readonly TenantRequestService _tenantRequestService;
-        private readonly TenantPostValidator _tenantPostValidator;
+        private readonly TenantRequestValidator _tenantRequestValidator;
 
         public TenantController(
             TenantRequestService tenantRequestService,
-            TenantPostValidator tenantPostValidator,
+            TenantRequestValidator tenantRequestValidator,
             AuthenticationDetailService authDetailService) : base(authDetailService)
         {
             _tenantRequestService = tenantRequestService;
-            _tenantPostValidator = tenantPostValidator;
+            _tenantRequestValidator = tenantRequestValidator;
         }
 
         [HttpGet("{id}")]
@@ -33,10 +33,10 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<TenantModel>> Post(TenantPost model)
+        public async Task<ActionResult<TenantModel>> Post(TenantRequest model)
         {
-            if (!await _tenantPostValidator.IsValidAsync(model))
-                return _tenantPostValidator.ServiceResponse.ToActionResult();
+            if (!await _tenantRequestValidator.IsValidAsync(model))
+                return _tenantRequestValidator.ServiceResponse.ToActionResult();
 
             var result = await _tenantRequestService.ProcessCreateRequestAsync(model, model.OwnerUserId.Value);
             return result.ToActionResult(

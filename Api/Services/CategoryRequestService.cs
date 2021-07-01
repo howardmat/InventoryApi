@@ -1,5 +1,6 @@
 ﻿using Api.Handlers;
 using Api.Models.Dto;
+using Api.Models.RequestModels;
 using Data.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -42,7 +43,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler<CategoryModel>> ProcessCreateRequestAsync(CategoryType requestCategoryType, CategoryModel model, int createdByUserId, int tenantId)
+        public async Task<ResponseHandler<CategoryModel>> ProcessCreateRequestAsync(CategoryType requestCategoryType, CategoryRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<CategoryModel>();
 
@@ -55,7 +56,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryModel model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryRequest model, int modifiedByUserId)
         {
             var response = new ResponseHandler();
 

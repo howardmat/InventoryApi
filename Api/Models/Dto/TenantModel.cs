@@ -1,15 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Api.Models.Dto
+﻿namespace Api.Models.Dto
 {
     public class TenantModel
     {
-        public int? Id { get; set; }
-
-        [MaxLength(255)]
+        public int Id { get; set; }
         public string CompanyName { get; set; }
-
-        [Required]
         public AddressModel PrimaryAddress { get; set; }
     }
 }

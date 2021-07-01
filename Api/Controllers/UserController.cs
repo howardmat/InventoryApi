@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
 using Api.Services;
 using Api.Validation.Validators;
 using Microsoft.AspNetCore.Authorization;
@@ -12,16 +13,16 @@ namespace Api.Controllers
     [ApiController]
     public class UserController : InventoryControllerBase
     {
-        private readonly UserPostValidator _userPostValidator;
+        private readonly UserRequestValidator _userRequestValidator;
         private readonly UserRequestService _userRequestService;
 
         public UserController(
             AuthenticationDetailService authDetailService,
             UserRequestService userRequestService,
-            UserPostValidator userPostValidator) : base(authDetailService)
+            UserRequestValidator userRequestValidator) : base(authDetailService)
         {
             _userRequestService = userRequestService;
-            _userPostValidator = userPostValidator;
+            _userRequestValidator = userRequestValidator;
         }
 
         [HttpGet("{id}")]
@@ -32,10 +33,10 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UserModel>> Post(UserModel model)
+        public async Task<ActionResult<UserModel>> Post(UserRequest model)
         {
-            if (!await _userPostValidator.IsValidAsync(model))
-                return _userPostValidator.ServiceResponse.ToActionResult();
+            if (!await _userRequestValidator.IsValidAsync(model))
+                return _userRequestValidator.ServiceResponse.ToActionResult();
 
             var userId = await GetCurrentUserIdAsync(User);
 

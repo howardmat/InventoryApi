@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -60,7 +61,7 @@ namespace Api.Services
             return model;
         }
 
-        public async Task<MaterialInventoryTransactionModel> CreateAsync(MaterialInventoryTransactionModel model, int modifyingUserId, int tenantId)
+        public async Task<MaterialInventoryTransactionModel> CreateAsync(MaterialInventoryTransactionRequest model, int modifyingUserId, int tenantId)
         {
             MaterialInventoryTransactionModel newModel = null;
 
