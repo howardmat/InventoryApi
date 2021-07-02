@@ -22,10 +22,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<CategoryModel>> ListAsync(CategoryType categoryType)
+        public async Task<IEnumerable<CategoryModel>> ListAsync(CategoryType categoryType, int tenantId)
         {
             // Fetch data
-            var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType);
+            var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType, tenantId);
 
             // Add to collection
             var list = new List<CategoryModel>();
@@ -37,20 +37,20 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<Category> GetEntityOrDefaultAsync(int id)
+        public async Task<Category> GetEntityOrDefaultAsync(int id, int tenantId)
         {
             // Fetch object
-            var entity = await _unitOfWork.CategoryRepository.GetAsync(id);
+            var entity = await _unitOfWork.CategoryRepository.GetAsync(id, tenantId);
 
             return entity;
         }
 
-        public async Task<CategoryModel> GetModelOrDefaultAsync(CategoryType categoryType, int id)
+        public async Task<CategoryModel> GetModelOrDefaultAsync(CategoryType categoryType, int id, int tenantId)
         {
             CategoryModel model = null;
 
             // Fetch object
-            var category = await GetEntityOrDefaultAsync(id);
+            var category = await GetEntityOrDefaultAsync(id, tenantId);
             if (category != null && category.Type == categoryType)
             {
                 model = _mapper.Map<CategoryModel>(category);

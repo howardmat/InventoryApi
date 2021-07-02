@@ -1,6 +1,7 @@
 ﻿using Data.Models;
 using Data.SeedData;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Data
 {
@@ -43,6 +44,22 @@ namespace Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            builder.Entity<Category>(e =>
+            {
+                e.HasOne(u => u.Tenant)
+                    .WithMany()
+                    .HasForeignKey(u => u.TenantId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            builder.Entity<Formula>(e =>
+            {
+                e.HasOne(u => u.Tenant)
+                    .WithMany()
+                    .HasForeignKey(u => u.TenantId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
             builder.Entity<FormulaIngredient>(e =>
             {
                 e.Property(f => f.Quantity).HasPrecision(19, 4);
@@ -74,11 +91,21 @@ namespace Data
             builder.Entity<Product>(e =>
             {
                 e.Property(f => f.Price).HasPrecision(19, 4);
+
+                e.HasOne(u => u.Tenant)
+                   .WithMany()
+                   .HasForeignKey(u => u.TenantId)
+                   .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<ProductInventoryTransaction>(e =>
             {
                 e.Property(f => f.Quantity).HasPrecision(19, 4);
+
+                e.HasOne(u => u.Tenant)
+                   .WithMany()
+                   .HasForeignKey(u => u.TenantId)
+                   .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<Province>(e =>

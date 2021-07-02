@@ -13,10 +13,10 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<Country>> ListAsync()
         {
-            return await (from c in _context.Country
-                          orderby c.DisplayOrder, c.Name
-                          select c)
-                        .ToListAsync();
+            return await _context.Country
+                .OrderBy(c => c.DisplayOrder)
+                .ThenBy(c => c.Name)
+                .ToListAsync();
         }
     }
 }

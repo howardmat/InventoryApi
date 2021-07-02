@@ -1,6 +1,6 @@
 ﻿namespace Data.Models
 {
-    public class ProductInventoryTransaction : InventoryBaseModel
+    public class ProductInventoryTransaction : TenantInventoryBaseModel
     {
         public int ProductId { get; set; }
         public int OrderDetailId { get; set; }

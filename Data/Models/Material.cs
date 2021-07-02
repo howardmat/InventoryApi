@@ -2,11 +2,8 @@
 
 namespace Data.Models
 {
-    public class Material : InventoryBaseModel
+    public class Material : TenantInventoryBaseModel
     {
-        public int TenantId { get; set; }
-        public virtual Tenant Tenant { get; set; }
-
         public int UnitOfMeasurementId { get; set; }
         public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
 

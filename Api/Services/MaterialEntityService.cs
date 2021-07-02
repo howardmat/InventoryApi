@@ -22,10 +22,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<MaterialModel>> ListAsync()
+        public async Task<IEnumerable<MaterialModel>> ListAsync(int tenantId)
         {
             // Fetch data
-            var data = await _unitOfWork.MaterialRepository.ListAsync();
+            var data = await _unitOfWork.MaterialRepository.ListAsync(tenantId);
 
             // Add to collection
             var list = new List<MaterialModel>();
@@ -37,20 +37,20 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<Material> GetEntityOrDefaultAsync(int id)
+        public async Task<Material> GetEntityOrDefaultAsync(int id, int tenantId)
         {
             // Fetch object
-            var entity = await _unitOfWork.MaterialRepository.GetAsync(id);
+            var entity = await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
 
             return entity;
         }
 
-        public async Task<MaterialModel> GetModelOrDefaultAsync(int id)
+        public async Task<MaterialModel> GetModelOrDefaultAsync(int id, int tenantId)
         {
             MaterialModel model = null;
 
             // Fetch object
-            var material = await _unitOfWork.MaterialRepository.GetAsync(id);
+            var material = await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
 
             // Set response
             if (material != null)

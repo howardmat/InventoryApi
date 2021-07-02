@@ -22,10 +22,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductModel>> ListAsync()
+        public async Task<IEnumerable<ProductModel>> ListAsync(int tenantId)
         {
             // Fetch data
-            var data = await _unitOfWork.ProductRepository.ListAsync();
+            var data = await _unitOfWork.ProductRepository.ListAsync(tenantId);
 
             // Add to collection
             var list = new List<ProductModel>();
@@ -37,20 +37,20 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<Product> GetEntityOrDefaultAsync(int id)
+        public async Task<Product> GetEntityOrDefaultAsync(int id, int tenantId)
         {
             // Fetch object
-            var entity = await _unitOfWork.ProductRepository.GetAsync(id);
+            var entity = await _unitOfWork.ProductRepository.GetAsync(id, tenantId);
 
             return entity;
         }
 
-        public async Task<ProductModel> GetModelOrDefaultAsync(int id)
+        public async Task<ProductModel> GetModelOrDefaultAsync(int id, int tenantId)
         {
             ProductModel model = null;
 
             // Fetch object
-            var product = await _unitOfWork.ProductRepository.GetAsync(id);
+            var product = await _unitOfWork.ProductRepository.GetAsync(id, tenantId);
 
             // Set response
             if (product != null)

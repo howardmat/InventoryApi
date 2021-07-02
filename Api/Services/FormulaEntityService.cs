@@ -22,10 +22,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<FormulaModel>> ListAsync()
+        public async Task<IEnumerable<FormulaModel>> ListAsync(int tenantId)
         {
             // Fetch data
-            var data = await _unitOfWork.FormulaRepository.ListAsync();
+            var data = await _unitOfWork.FormulaRepository.ListAsync(tenantId);
 
             // Add to collection
             var list = new List<FormulaModel>();
@@ -37,20 +37,20 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<Formula> GetEntityOrDefaultAsync(int id)
+        public async Task<Formula> GetEntityOrDefaultAsync(int id, int tenantId)
         {
             // Fetch object
-            var entity = await _unitOfWork.FormulaRepository.GetAsync(id);
+            var entity = await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
 
             return entity;
         }
 
-        public async Task<FormulaModel> GetModelOrDefaultAsync(int id)
+        public async Task<FormulaModel> GetModelOrDefaultAsync(int id, int tenantId)
         {
             FormulaModel model = null;
 
             // Fetch object
-            var formula = await _unitOfWork.FormulaRepository.GetAsync(id);
+            var formula = await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
 
             // Set response
             if (formula != null)

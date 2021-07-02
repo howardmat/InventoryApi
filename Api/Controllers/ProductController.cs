@@ -29,14 +29,18 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductModel>>> Get()
         {
-            var result = await _productRequestService.ProcessListRequestAsync();
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _productRequestService.ProcessListRequestAsync(tenantId);
             return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductModel>> Get(int id)
         {
-            var result = await _productRequestService.ProcessGetRequestAsync(id);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _productRequestService.ProcessGetRequestAsync(id, tenantId);
             return result.ToActionResult();
         }
 
@@ -61,8 +65,9 @@ namespace Api.Controllers
                 return _productRequestValidator.ServiceResponse.ToActionResult();
 
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
-            var result = await _productRequestService.ProcessUpdateRequestAsync(id, model, userId);
+            var result = await _productRequestService.ProcessUpdateRequestAsync(id, model, userId, tenantId);
             return result.ToActionResult();
         }
 
@@ -70,8 +75,9 @@ namespace Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
-            var result = await _productRequestService.ProcessDeleteRequestAsync(id, userId);
+            var result = await _productRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
             return result.ToActionResult();
         }
     }

@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Extensions;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,22 +13,23 @@ namespace Data.Repositories
 
         public FormulaRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Formula>> ListAsync()
+        public async Task<IEnumerable<Formula>> ListAsync(int tenantId)
         {
-            return await (from f in _context.Formula
-                          orderby f.Name
-                          where !f.DeletedUtc.HasValue
-                          select f)
-                        .ToListAsync();
+            return await _context.Formula
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .OrderBy(f => f.Name)
+                .ToListAsync();
         }
 
-        public async Task<Formula> GetAsync(int id)
+        public async Task<Formula> GetAsync(int id, int tenantId)
         {
-            return await (from f in _context.Formula
-                          where f.Id == id
-                            && !f.DeletedUtc.HasValue
-                          select f)
-                        .FirstOrDefaultAsync();
+            return await _context.Formula
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .Where(f => f.Id == id)
+                .OrderBy(f => f.Name)
+                .FirstOrDefaultAsync();
         }
     }
 }

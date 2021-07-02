@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Extensions;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,31 +14,28 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<Tenant>> ListAsync()
         {
-            return await (from t in _context.Tenant
-                          orderby t.CompanyName
-                          where !t.DeletedUtc.HasValue
-                          select t)
-                        .ToListAsync();
+            return await _context.Tenant
+                .WhereNotDeleted()
+                .OrderBy(p => p.CompanyName)
+                .ToListAsync();
         }
 
         public async Task<Tenant> GetAsync(int id)
         {
-            return await (from e in _context.Tenant
-                          where e.Id == id
-                            && !e.DeletedUtc.HasValue
-                          select e)
-                          .Include(t => t.PrimaryAddress.Country)
-                          .Include(t => t.PrimaryAddress.Province)
-                        .FirstOrDefaultAsync();
+            return await _context.Tenant
+                .WhereNotDeleted()
+                .Where(t => t.Id == id)
+                .Include(t => t.PrimaryAddress.Country)
+                .Include(t => t.PrimaryAddress.Province)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<Tenant> FindByOwnerIdAsync(int ownerUserId)
         {
-            return await (from e in _context.Tenant
-                          where e.OwnerUserId == ownerUserId
-                            && !e.DeletedUtc.HasValue
-                          select e)
-                        .FirstOrDefaultAsync();
+            return await _context.Tenant
+                .WhereNotDeleted()
+                .Where(t => t.OwnerUserId == ownerUserId)
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -15,20 +15,20 @@ namespace Api.Services
             _materialInventoryTransactionService = materialInventoryTransactionService;
         }
 
-        public async Task<ResponseHandler<IEnumerable<MaterialInventoryTransactionModel>>> ProcessListRequestAsync(int materialId)
+        public async Task<ResponseHandler<IEnumerable<MaterialInventoryTransactionModel>>> ProcessListRequestAsync(int materialId, int tenantId)
         {
             var response = new ResponseHandler<IEnumerable<MaterialInventoryTransactionModel>>();
 
-            response.Data = await _materialInventoryTransactionService.ListAsync(materialId);
+            response.Data = await _materialInventoryTransactionService.ListAsync(materialId, tenantId);
 
             return response;
         }
 
-        public async Task<ResponseHandler<MaterialInventoryTransactionModel>> ProcessGetRequestAsync(int id)
+        public async Task<ResponseHandler<MaterialInventoryTransactionModel>> ProcessGetRequestAsync(int id, int tenantId)
         {
             var response = new ResponseHandler<MaterialInventoryTransactionModel>();
 
-            response.Data = await _materialInventoryTransactionService.GetModelOrDefaultAsync(id);
+            response.Data = await _materialInventoryTransactionService.GetModelOrDefaultAsync(id, tenantId);
             if (response.Data == null)
             {
                 response.SetNotFound($"Unable to locate Material Inventory record ({id})");
@@ -50,11 +50,11 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
-            var entity = await _materialInventoryTransactionService.GetEntityOrDefaultAsync(id);
+            var entity = await _materialInventoryTransactionService.GetEntityOrDefaultAsync(id, tenantId);
             if (entity != null)
             {
                 if (!await _materialInventoryTransactionService.DeleteAsync(entity, deletedByUserId))

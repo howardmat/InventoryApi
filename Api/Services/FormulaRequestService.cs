@@ -17,20 +17,20 @@ namespace Api.Services
             _formulaEntityService = formulaEntityService;
         }
 
-        public async Task<ResponseHandler<IEnumerable<FormulaModel>>> ProcessListRequestAsync()
+        public async Task<ResponseHandler<IEnumerable<FormulaModel>>> ProcessListRequestAsync(int tenantId)
         {
             var response = new ResponseHandler<IEnumerable<FormulaModel>>();
 
-            response.Data = await _formulaEntityService.ListAsync();
+            response.Data = await _formulaEntityService.ListAsync(tenantId);
 
             return response;
         }
 
-        public async Task<ResponseHandler<FormulaModel>> ProcessGetRequestAsync(int id)
+        public async Task<ResponseHandler<FormulaModel>> ProcessGetRequestAsync(int id, int tenantId)
         {
             var response = new ResponseHandler<FormulaModel>();
 
-            response.Data = await _formulaEntityService.GetModelOrDefaultAsync(id);
+            response.Data = await _formulaEntityService.GetModelOrDefaultAsync(id, tenantId);
             if (response.Data == null)
             {
                 response.SetNotFound($"Unable to locate Formula object ({id})");
@@ -52,12 +52,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, FormulaRequest model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, FormulaRequest model, int modifiedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var formula = await _formulaEntityService.GetEntityOrDefaultAsync(id);
+            var formula = await _formulaEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (formula != null)
             {
                 if (!await _formulaEntityService.UpdateAsync(formula, model, modifiedByUserId))
@@ -73,12 +73,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var formula = await _formulaEntityService.GetEntityOrDefaultAsync(id);
+            var formula = await _formulaEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (formula != null)
             {
                 if (!await _formulaEntityService.DeleteAsync(formula, deletedByUserId))

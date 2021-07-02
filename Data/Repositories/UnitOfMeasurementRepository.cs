@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Extensions;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,20 +15,19 @@ namespace Data.Repositories
 
         public async Task<IEnumerable<UnitOfMeasurement>> ListAsync()
         {
-            return await (from u in _context.UnitOfMeasurement
-                          orderby u.Name
-                          where !u.DeletedUtc.HasValue
-                          select u)
-                        .ToListAsync();
+            return await _context.UnitOfMeasurement
+                .WhereNotDeleted()
+                .OrderBy(m => m.Name)
+                .ToListAsync();
         }
 
         public async Task<UnitOfMeasurement> GetAsync(int id)
         {
-            return await (from u in _context.UnitOfMeasurement
-                          where u.Id == id
-                            && !u.DeletedUtc.HasValue
-                          select u)
-                        .FirstOrDefaultAsync();
+            return await _context.UnitOfMeasurement
+                .WhereNotDeleted()
+                .Where(u => u.Id == id)
+                .OrderBy(m => m.Name)
+                .FirstOrDefaultAsync();
         }
     }
 }

@@ -25,7 +25,9 @@ namespace Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MaterialInventoryTransactionModel>> Get(int id)
         {
-            var result = await _materialTransactionRequestService.ProcessGetRequestAsync(id);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _materialTransactionRequestService.ProcessGetRequestAsync(id, tenantId);
             return result.ToActionResult();
         }
 
@@ -33,7 +35,9 @@ namespace Api.Controllers
         [Route("/material/{materialId}/inventory")]
         public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
         {
-            var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId, tenantId);
             return result.ToActionResult();
         }
 
@@ -52,8 +56,9 @@ namespace Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
-            var result = await _materialTransactionRequestService.ProcessDeleteRequestAsync(id, userId);
+            var result = await _materialTransactionRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
             return result.ToActionResult();
         }
     }

@@ -16,13 +16,11 @@ namespace Api.Claims
         }
 
         public async Task Invoke(HttpContext httpContext,
-            UserEntityService userEntityService,
             AuthenticationDetailService authDetailService)
         {
             if (httpContext.User != null && httpContext.User.Identity.IsAuthenticated)
             {
-                var userId = await authDetailService.GetUserIdBasedOnClaimsAsync(httpContext.User);
-                var user = await userEntityService.GetEntityOrDefaultAsync(userId);
+                var user = await authDetailService.GetUserBasedOnClaimsAsync(httpContext.User);
 
                 var identity = httpContext.User.Identities.FirstOrDefault();
                 if (identity != null)

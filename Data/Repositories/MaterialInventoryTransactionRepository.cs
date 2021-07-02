@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Extensions;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,23 +13,23 @@ namespace Data.Repositories
 
         public MaterialInventoryTransactionRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<MaterialInventoryTransaction>> ListAsync(int materialId)
+        public async Task<IEnumerable<MaterialInventoryTransaction>> ListAsync(int materialId, int tenantId)
         {
-            return await (from u in _context.MaterialInventoryTransaction
-                          orderby u.CreatedUtc descending
-                          where u.MaterialId == materialId
-                            && !u.DeletedUtc.HasValue
-                          select u)
-                        .ToListAsync();
+            return await _context.MaterialInventoryTransaction
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .Where(m => m.MaterialId == materialId)
+                .ToListAsync();
         }
 
-        public async Task<MaterialInventoryTransaction> GetAsync(int id)
+        public async Task<MaterialInventoryTransaction> GetAsync(int id, int tenantId)
         {
-            return await (from u in _context.MaterialInventoryTransaction
-                          where u.Id == id
-                            && !u.DeletedUtc.HasValue
-                          select u)
-                        .FirstOrDefaultAsync();
+            return await _context.MaterialInventoryTransaction
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .Where(m => m.Id == id)
+                .FirstOrDefaultAsync();
+                        
         }
     }
 }

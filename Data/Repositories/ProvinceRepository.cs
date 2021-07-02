@@ -13,20 +13,19 @@ namespace Data.Repositories
 
         public async Task<Province> GetAsync(string countryCode, string provinceCode)
         {
-            return await (from p in _context.Province
-                          where p.CountryIsoCode.ToLower() == countryCode.ToLower()
-                            && p.IsoCode.ToLower() == provinceCode.ToLower()
-                          select p)
-                          .FirstOrDefaultAsync();
+            return await _context.Province
+                .Where(p => p.CountryIsoCode.ToLower() == countryCode.ToLower())
+                .Where(p => p.IsoCode.ToLower() == provinceCode.ToLower())
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Province>> ListAsync(string countryCode)
         {
-            return await (from p in _context.Province
-                          where p.CountryIsoCode.ToLower() == countryCode.ToLower()
-                          orderby p.DisplayOrder, p.Name
-                          select p)
-                        .ToListAsync();
+            return await _context.Province
+                .Where(p => p.CountryIsoCode.ToLower() == countryCode.ToLower())
+                .OrderBy(p => p.DisplayOrder)
+                .ThenBy(p => p.Name)
+                .ToListAsync();
         }
     }
 }

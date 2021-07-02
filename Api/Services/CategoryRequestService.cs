@@ -17,20 +17,20 @@ namespace Api.Services
             _categoryEntityService = categoryEntityService;
         }
 
-        public async Task<ResponseHandler<IEnumerable<CategoryModel>>> ProcessListRequestAsync(CategoryType categoryType)
+        public async Task<ResponseHandler<IEnumerable<CategoryModel>>> ProcessListRequestAsync(CategoryType categoryType, int tenantId)
         {
             var response = new ResponseHandler<IEnumerable<CategoryModel>>();
 
-            response.Data = await _categoryEntityService.ListAsync(categoryType);
+            response.Data = await _categoryEntityService.ListAsync(categoryType, tenantId);
 
             return response;
         }
 
-        public async Task<ResponseHandler<CategoryModel>> ProcessGetRequestAsync(CategoryType requestCategoryType, int id)
+        public async Task<ResponseHandler<CategoryModel>> ProcessGetRequestAsync(CategoryType requestCategoryType, int id, int tenantId)
         {
             var response = new ResponseHandler<CategoryModel>();
 
-            var category = await _categoryEntityService.GetModelOrDefaultAsync(requestCategoryType, id);
+            var category = await _categoryEntityService.GetModelOrDefaultAsync(requestCategoryType, id, tenantId);
             if (category != null)
             {
                 response.Data = category;
@@ -56,12 +56,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryRequest model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(CategoryType requestCategoryType, int id, CategoryRequest model, int modifiedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
+            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (category != null && category.Type == requestCategoryType)
             {
                 // Try to update and set response
@@ -78,12 +78,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessDeleteRequestAsync(CategoryType requestCategoryType, int id, int deletedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(CategoryType requestCategoryType, int id, int deletedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id);
+            var category = await _categoryEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (category != null && category.Type == requestCategoryType)
             {
                 // Try to update and set response

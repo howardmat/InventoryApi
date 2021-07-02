@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Extensions;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -12,23 +13,31 @@ namespace Data.Repositories
         private InventoryDbContext _context => Context as InventoryDbContext;
         public CategoryRepository(InventoryDbContext context) : base(context) { }
 
-        public async Task<IEnumerable<Category>> ListAsync(CategoryType categoryType)
+        public async Task<IEnumerable<Category>> ListAsync(CategoryType categoryType, int tenantId)
         {
-            return await (from c in _context.Category
-                          orderby c.Name
-                          where !c.DeletedUtc.HasValue
-                            && c.Type == categoryType
-                          select c)
-                        .ToListAsync();
+            return await _context.Category
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .Where(c => c.Type == categoryType)
+                .OrderBy(c => c.Name)
+                .ToListAsync();
         }
 
-        public async Task<Category> GetAsync(int id)
+        public async Task<Category> GetAsync(int id, int tenantId)
         {
-            return await (from c in _context.Category
-                          where c.Id == id
-                            && !c.DeletedUtc.HasValue
-                          select c)
-                        .FirstOrDefaultAsync();
+            return await _context.Category
+                .WhereNotDeleted()
+                .WhereBelongsToTenant(tenantId)
+                .Where(c => c.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Category> GetByIdAsync(int id)
+        {
+            return await _context.Category
+                .WhereNotDeleted()
+                .Where(c => c.Id == id)
+                .FirstOrDefaultAsync();
         }
     }
 }

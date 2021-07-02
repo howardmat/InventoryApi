@@ -22,9 +22,9 @@ namespace Api.Controllers
         {
             if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentUserIdAsync to be called in child class.");
 
-            var userId = await _authenticationDetailService.GetUserIdBasedOnClaimsAsync(principal);
+            var user = await _authenticationDetailService.GetUserBasedOnClaimsAsync(principal);
 
-            return userId;
+            return user.Id;
         }
 
         protected int GetCurrentTenantId(ClaimsPrincipal principal)

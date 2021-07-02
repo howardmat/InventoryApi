@@ -1,8 +1,5 @@
 using Api.Claims;
 using Api.Extensions;
-using Api.Models.MapProfiles;
-using Api.Services;
-using Api.Validation.Validators;
 using Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
 
 namespace Api
 {
@@ -34,8 +32,12 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<InventoryDbContext>(options =>
+            {
                 options.UseSqlServer(
-                    _configuration.GetConnectionString("DefaultConnection")));
+                    _configuration.GetConnectionString("DefaultConnection"));
+
+                options.LogTo(Console.WriteLine);
+            });
 
             services.AddInventoryProfilesForAutoMapper();
 

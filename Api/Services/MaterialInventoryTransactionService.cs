@@ -22,10 +22,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<MaterialInventoryTransactionModel>> ListAsync(int materialId)
+        public async Task<IEnumerable<MaterialInventoryTransactionModel>> ListAsync(int materialId, int tenantId)
         {
             // Fetch data
-            var data = await _unitOfWork.MaterialInventoryTransactionRepository.ListAsync(materialId);
+            var data = await _unitOfWork.MaterialInventoryTransactionRepository.ListAsync(materialId, tenantId);
 
             // Add to collection
             var list = new List<MaterialInventoryTransactionModel>();
@@ -37,20 +37,20 @@ namespace Api.Services
             return list;
         }
 
-        public async Task<MaterialInventoryTransaction> GetEntityOrDefaultAsync(int id)
+        public async Task<MaterialInventoryTransaction> GetEntityOrDefaultAsync(int id, int tenantId)
         {
             // Fetch object
-            var entity = await _unitOfWork.MaterialInventoryTransactionRepository.GetAsync(id);
+            var entity = await _unitOfWork.MaterialInventoryTransactionRepository.GetAsync(id, tenantId);
 
             return entity;
         }
 
-        public async Task<MaterialInventoryTransactionModel> GetModelOrDefaultAsync(int id)
+        public async Task<MaterialInventoryTransactionModel> GetModelOrDefaultAsync(int id, int tenantId)
         {
             MaterialInventoryTransactionModel model = null;
 
             // Fetch object
-            var materialInventoryTransaction = await GetEntityOrDefaultAsync(id);
+            var materialInventoryTransaction = await GetEntityOrDefaultAsync(id, tenantId);
 
             // Set response
             if (materialInventoryTransaction != null)

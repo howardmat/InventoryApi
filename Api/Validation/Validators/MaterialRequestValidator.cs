@@ -21,7 +21,7 @@ namespace Api.Validation.Validators
         {
             var isValid = true;
 
-            var category = await _unitOfWork.CategoryRepository.GetAsync(model.CategoryId.Value);
+            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(model.CategoryId.Value);
             if (category == null || category.Type != CATEGORY_TYPE)
             {
                 isValid = false;

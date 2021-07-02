@@ -1,5 +1,6 @@
 ﻿using Api.Claims;
 using Data;
+using Data.Models;
 using System;
 using System.Linq;
 using System.Security.Claims;
@@ -31,7 +32,7 @@ namespace Api.Services
             return tenantId;
         }
 
-        public async Task<int> GetUserIdBasedOnClaimsAsync(ClaimsPrincipal principal)
+        public async Task<UserProfile> GetUserBasedOnClaimsAsync(ClaimsPrincipal principal)
         {
             var authProviderUserId = GetAuthenticationProviderUserIdOrDefault(principal);
 
@@ -41,7 +42,7 @@ namespace Api.Services
                 throw new Exception("UserId not found for currently authenticated user.");
             }
 
-            return user.Id;
+            return user;
         }
     }
 }

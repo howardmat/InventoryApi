@@ -7,7 +7,8 @@ namespace Data.Repositories
 {
     public interface ICategoryRepository : IRepository<Category>
     {
-        Task<IEnumerable<Category>> ListAsync(CategoryType categoryType);
-        Task<Category> GetAsync(int id);
+        Task<IEnumerable<Category>> ListAsync(CategoryType categoryType, int tenantId);
+        Task<Category> GetAsync(int id, int tenantId);
+        Task<Category> GetByIdAsync(int id);
     }
 }

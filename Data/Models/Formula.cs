@@ -3,11 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models
 {
-    public class Formula : InventoryBaseModel
+    public class Formula : TenantInventoryBaseModel
     {
-        public int TenantId { get; set; }
-        public virtual Tenant Tenant { get; set; }
-
         public int CategoryId { get; set; }
         public virtual Category Category { get; set; }
 

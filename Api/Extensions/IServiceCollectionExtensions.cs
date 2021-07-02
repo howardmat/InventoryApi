@@ -52,6 +52,7 @@ namespace Api.Extensions
 
         public static void AddInventoryValidators(this IServiceCollection services)
         {
+            services.AddTransient<FormulaRequestValidator>();
             services.AddTransient<UserRequestValidator>();
             services.AddTransient<MaterialRequestValidator>();
             services.AddTransient<RegisterUserRequestValidator>();

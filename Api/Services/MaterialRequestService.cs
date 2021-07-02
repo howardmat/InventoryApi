@@ -15,20 +15,20 @@ namespace Api.Services
             _materialEntityService = materialEntityService;
         }
 
-        public async Task<ResponseHandler<IEnumerable<MaterialModel>>> ProcessListRequestAsync()
+        public async Task<ResponseHandler<IEnumerable<MaterialModel>>> ProcessListRequestAsync(int tenantId)
         {
             var response = new ResponseHandler<IEnumerable<MaterialModel>>();
 
-            response.Data = await _materialEntityService.ListAsync();
+            response.Data = await _materialEntityService.ListAsync(tenantId);
 
             return response;
         }
 
-        public async Task<ResponseHandler<MaterialModel>> ProcessGetRequestAsync(int id)
+        public async Task<ResponseHandler<MaterialModel>> ProcessGetRequestAsync(int id, int tenantId)
         {
             var response = new ResponseHandler<MaterialModel>();
 
-            response.Data = await _materialEntityService.GetModelOrDefaultAsync(id);
+            response.Data = await _materialEntityService.GetModelOrDefaultAsync(id, tenantId);
             if (response.Data == null)
             {
                 response.SetNotFound($"Unable to locate Material object ({id})");
@@ -50,12 +50,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, MaterialRequest model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, MaterialRequest model, int modifiedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var material = await _materialEntityService.GetEntityOrDefaultAsync(id);
+            var material = await _materialEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (material != null)
             {
                 if (!await _materialEntityService.UpdateAsync(material, model, modifiedByUserId))
@@ -71,12 +71,12 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId)
+        public async Task<ResponseHandler> ProcessDeleteRequestAsync(int id, int deletedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
 
             // Fetch the existing object
-            var material = await _materialEntityService.GetEntityOrDefaultAsync(id);
+            var material = await _materialEntityService.GetEntityOrDefaultAsync(id, tenantId);
             if (material != null)
             {
                 if (!await _materialEntityService.DeleteAsync(material, deletedByUserId))

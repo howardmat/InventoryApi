@@ -28,14 +28,18 @@ namespace Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> Get()
         {
-            var result = await _categoryRequestService.ProcessListRequestAsync(CATEGORY_TYPE);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _categoryRequestService.ProcessListRequestAsync(CATEGORY_TYPE, tenantId);
             return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryModel>> Get(int id)
         {
-            var result = await _categoryRequestService.ProcessGetRequestAsync(CATEGORY_TYPE, id);
+            var tenantId = GetCurrentTenantId(User);
+
+            var result = await _categoryRequestService.ProcessGetRequestAsync(CATEGORY_TYPE, id, tenantId);
             return result.ToActionResult();
         }
 
@@ -54,8 +58,9 @@ namespace Api.Controllers
         public async Task<IActionResult> Put(int id, CategoryRequest model)
         {
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
-            var result = await _categoryRequestService.ProcessUpdateRequestAsync(CATEGORY_TYPE, id, model, userId);
+            var result = await _categoryRequestService.ProcessUpdateRequestAsync(CATEGORY_TYPE, id, model, userId, tenantId);
             return result.ToActionResult();
         }
 
@@ -63,8 +68,9 @@ namespace Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var userId = await GetCurrentUserIdAsync(User);
+            var tenantId = GetCurrentTenantId(User);
 
-            var result = await _categoryRequestService.ProcessDeleteRequestAsync(CATEGORY_TYPE, id, userId);
+            var result = await _categoryRequestService.ProcessDeleteRequestAsync(CATEGORY_TYPE, id, userId, tenantId);
             return result.ToActionResult();
         }
     }
