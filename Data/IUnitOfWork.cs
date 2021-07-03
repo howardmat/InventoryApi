@@ -9,6 +9,7 @@ namespace Data
         ICategoryRepository CategoryRepository { get; }
         ICountryRepository CountryRepository { get; }
         IFormulaRepository FormulaRepository { get; }
+        IFormulaIngredientRepository FormulaIngredientRepository { get; }
         IMaterialRepository MaterialRepository { get; }
         IMaterialInventoryTransactionRepository MaterialInventoryTransactionRepository { get; }
         IProductRepository ProductRepository { get; }

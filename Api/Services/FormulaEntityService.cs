@@ -1,8 +1,10 @@
-﻿using Api.Models.Dto;
+﻿using Api.Authorization;
+using Api.Models.Dto;
 using Api.Models.RequestModels;
 using AutoMapper;
 using Data;
 using Data.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -11,15 +13,21 @@ namespace Api.Services
 {
     public class FormulaEntityService
     {
+        private readonly ILogger<FormulaEntityService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
 
         public FormulaEntityService(
+            ILogger<FormulaEntityService> logger,
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
         {
+            _logger = logger;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _materialAuthorizationProvider = materialAuthorizationProvider;
         }
 
         public async Task<IEnumerable<FormulaModel>> ListAsync(int tenantId)
@@ -80,6 +88,32 @@ namespace Api.Services
                 LastModifiedUtc = now
             };
             await _unitOfWork.FormulaRepository.AddAsync(formula);
+
+            // Add Ingredients if included
+            foreach (var ingredient in model.Ingredients)
+            {
+                // Ensure MaterialId belongs to Tenant
+                if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, ingredient.MaterialId.Value))
+                {
+                    _logger.LogError("FormulaEntityService.CreateAsync - Failed due to MaterialId included in Ingredients collection. Tenant does not have access or MaterialId is invalid, MaterialId: [{MaterialId}]", ingredient.MaterialId);
+
+                    // An invalid MaterialId was passed in - request should fail
+                    return newModel;
+                }
+
+                var formulaIngredient = new FormulaIngredient
+                {
+                    Formula = formula,
+                    MaterialId = ingredient.MaterialId.Value,
+                    Quantity = ingredient.Quantity.Value,
+                    CreatedUserId = modifyingUserId,
+                    LastModifiedUserId = modifyingUserId,
+                    CreatedUtc = now,
+                    LastModifiedUtc = now
+                };
+
+                formula.Ingredients.Add(formulaIngredient);
+            }
 
             // Set response
             if (await _unitOfWork.CompleteAsync() > 0)

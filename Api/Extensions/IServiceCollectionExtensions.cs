@@ -1,4 +1,5 @@
-﻿using Api.Models.MapProfiles;
+﻿using Api.Authorization;
+using Api.Models.MapProfiles;
 using Api.Services;
 using Api.Validation.Validators;
 using Data;
@@ -16,6 +17,8 @@ namespace Api.Extensions
         public static void AddInventoryApplicationServices(this IServiceCollection services)
         {
             services.AddTransient<AuthenticationDetailService>();
+            services.AddTransient<ResourceAuthorization<MaterialAuthorizationProvider>>();
+            services.AddTransient<MaterialAuthorizationProvider>();
 
             services.AddTransient<CategoryEntityService>();
             services.AddTransient<CategoryRequestService>();

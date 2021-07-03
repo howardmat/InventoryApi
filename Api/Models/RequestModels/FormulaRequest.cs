@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Api.Models.RequestModels
 {
@@ -13,5 +14,7 @@ namespace Api.Models.RequestModels
 
         public string Description { get; set; }
         public string ImageFilename { get; set; }
+
+        public ICollection<FormulaIngredientRequest> Ingredients { get; set; }
     }
 }

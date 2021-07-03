@@ -8,6 +8,7 @@ namespace Data
         public ICategoryRepository CategoryRepository { get; }
         public ICountryRepository CountryRepository { get; }
         public IFormulaRepository FormulaRepository { get; }
+        public IFormulaIngredientRepository FormulaIngredientRepository { get; }
         public IMaterialRepository MaterialRepository { get; }
         public IMaterialInventoryTransactionRepository MaterialInventoryTransactionRepository { get; }
         public IProductRepository ProductRepository { get; }
@@ -25,6 +26,7 @@ namespace Data
             CategoryRepository = new CategoryRepository(_context);
             CountryRepository = new CountryRepository(_context);
             FormulaRepository = new FormulaRepository(_context);
+            FormulaIngredientRepository = new FormulaIngredientRepository(_context);
             MaterialRepository = new MaterialRepository(_context);
             MaterialInventoryTransactionRepository = new MaterialInventoryTransactionRepository(_context);
             ProductRepository = new ProductRepository(_context);
