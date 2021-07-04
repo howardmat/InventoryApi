@@ -19,6 +19,8 @@ namespace Api.Extensions
             services.AddTransient<AuthenticationDetailService>();
             services.AddTransient<ResourceAuthorization<MaterialAuthorizationProvider>>();
             services.AddTransient<MaterialAuthorizationProvider>();
+            services.AddTransient<ResourceAuthorization<FormulaAuthorizationProvider>>();
+            services.AddTransient<FormulaAuthorizationProvider>();
 
             services.AddTransient<CategoryEntityService>();
             services.AddTransient<CategoryRequestService>();

@@ -1,20 +1,27 @@
-﻿using Api.Handlers;
+﻿using Api.Authorization;
+using Api.Handlers;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
-using System;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Api.Services
 {
     public class FormulaRequestService
     {
+        private readonly ILogger<FormulaRequestService> _logger;
         private readonly FormulaEntityService _formulaEntityService;
+        private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+
         public FormulaRequestService(
-            FormulaEntityService formulaEntityService)
+            ILogger<FormulaRequestService> logger,
+            FormulaEntityService formulaEntityService,
+            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
         {
+            _logger = logger;
             _formulaEntityService = formulaEntityService;
+            _materialAuthorizationProvider = materialAuthorizationProvider;
         }
 
         public async Task<ResponseHandler<IEnumerable<FormulaModel>>> ProcessListRequestAsync(int tenantId)
@@ -42,6 +49,18 @@ namespace Api.Services
         public async Task<ResponseHandler<FormulaModel>> ProcessCreateRequestAsync(FormulaRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<FormulaModel>();
+
+            foreach (var ingredient in model.Ingredients)
+            {
+                // Ensure MaterialId belongs to Tenant
+                if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, ingredient.MaterialId.Value))
+                {
+                    _logger.LogError("FormulaRequestService.ProcessCreateRequestAsync - Failed due to MaterialId included in Ingredients collection. Tenant does not have access or MaterialId is invalid, MaterialId: [{MaterialId}]", ingredient.MaterialId);
+
+                    // An invalid MaterialId was passed in - request should fail
+                    return response;
+                }
+            }
 
             response.Data = await _formulaEntityService.CreateAsync(model, createdByUserId, tenantId);
             if (response.Data == null)

@@ -13,21 +13,15 @@ namespace Api.Services
 {
     public class FormulaEntityService
     {
-        private readonly ILogger<FormulaEntityService> _logger;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+        private readonly IMapper _mapper;   
 
         public FormulaEntityService(
-            ILogger<FormulaEntityService> logger,
             IUnitOfWork unitOfWork,
-            IMapper mapper,
-            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
+            IMapper mapper)
         {
-            _logger = logger;
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _materialAuthorizationProvider = materialAuthorizationProvider;
         }
 
         public async Task<IEnumerable<FormulaModel>> ListAsync(int tenantId)
@@ -92,15 +86,6 @@ namespace Api.Services
             // Add Ingredients if included
             foreach (var ingredient in model.Ingredients)
             {
-                // Ensure MaterialId belongs to Tenant
-                if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, ingredient.MaterialId.Value))
-                {
-                    _logger.LogError("FormulaEntityService.CreateAsync - Failed due to MaterialId included in Ingredients collection. Tenant does not have access or MaterialId is invalid, MaterialId: [{MaterialId}]", ingredient.MaterialId);
-
-                    // An invalid MaterialId was passed in - request should fail
-                    return newModel;
-                }
-
                 var formulaIngredient = new FormulaIngredient
                 {
                     Formula = formula,

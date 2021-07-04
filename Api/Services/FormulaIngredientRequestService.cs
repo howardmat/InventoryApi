@@ -1,4 +1,5 @@
-﻿using Api.Handlers;
+﻿using Api.Authorization;
+using Api.Handlers;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
 using System.Threading.Tasks;
@@ -8,6 +9,8 @@ namespace Api.Services
     public class FormulaIngredientRequestService
     {
         private readonly FormulaIngredientEntityService _formulaIngredientEntityService;
+        private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+        private readonly ResourceAuthorization<FormulaAuthorizationProvider> _formulaAuthorizationProvider;
 
         public FormulaIngredientRequestService(
             FormulaIngredientEntityService formulaIngredientEntityService)
@@ -18,6 +21,16 @@ namespace Api.Services
         public async Task<ResponseHandler<FormulaIngredientModel>> ProcessCreateRequestAsync(FormulaIngredientRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<FormulaIngredientModel>();
+
+            if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.MaterialId.Value))
+            {
+                response.SetError($"MaterialId is invalid");
+            }
+
+            if (!await _formulaAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.FormulaId.Value))
+            {
+                response.SetError($"FormulaId is invalid");
+            }
 
             response.Data = await _formulaIngredientEntityService.CreateAsync(model.FormulaId.Value, model.MaterialId.Value, model.Quantity.Value, createdByUserId);
             if (response.Data == null)
