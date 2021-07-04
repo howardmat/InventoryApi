@@ -1,4 +1,5 @@
-﻿using Api.Handlers;
+﻿using Api.Authorization;
+using Api.Handlers;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
 using System.Collections.Generic;
@@ -9,10 +10,14 @@ namespace Api.Services
     public class MaterialTransactionRequestService
     {
         private readonly MaterialInventoryTransactionService _materialInventoryTransactionService;
+        private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+
         public MaterialTransactionRequestService(
-            MaterialInventoryTransactionService materialInventoryTransactionService)
+            MaterialInventoryTransactionService materialInventoryTransactionService,
+            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
         {
             _materialInventoryTransactionService = materialInventoryTransactionService;
+            _materialAuthorizationProvider = materialAuthorizationProvider;
         }
 
         public async Task<ResponseHandler<IEnumerable<MaterialInventoryTransactionModel>>> ProcessListRequestAsync(int materialId, int tenantId)
@@ -40,6 +45,12 @@ namespace Api.Services
         public async Task<ResponseHandler<MaterialInventoryTransactionModel>> ProcessCreateRequestAsync(MaterialInventoryTransactionRequest model, int createdByUserId, int tenantId)
         {
             var response = new ResponseHandler<MaterialInventoryTransactionModel>();
+
+            if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.MaterialId.Value))
+            {
+                response.SetNotFound($"MaterialId [{model.MaterialId}] is invalid");
+                return response;
+            }
 
             response.Data = await _materialInventoryTransactionService.CreateAsync(model, createdByUserId, tenantId);
             if (response.Data == null)

@@ -1,4 +1,5 @@
-﻿using Api.Handlers;
+﻿using Api.Authorization;
+using Api.Handlers;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
 using System.Collections.Generic;
@@ -9,10 +10,14 @@ namespace Api.Services
     public class MaterialRequestService
     {
         private readonly MaterialEntityService _materialEntityService;
+        private readonly ResourceAuthorization<CategoryAuthorizationProvider> _categoryAuthorizationProvider;
+
         public MaterialRequestService(
-            MaterialEntityService materialEntityService)
+            MaterialEntityService materialEntityService,
+            ResourceAuthorization<CategoryAuthorizationProvider> categoryAuthorizationProvider)
         {
             _materialEntityService = materialEntityService;
+            _categoryAuthorizationProvider = categoryAuthorizationProvider;
         }
 
         public async Task<ResponseHandler<IEnumerable<MaterialModel>>> ProcessListRequestAsync(int tenantId)
@@ -41,6 +46,12 @@ namespace Api.Services
         {
             var response = new ResponseHandler<MaterialModel>();
 
+            if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.CategoryId.Value))
+            {
+                response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+                return response;
+            }
+
             response.Data = await _materialEntityService.CreateAsync(model, createdByUserId, tenantId);
             if (response.Data == null)
             {
@@ -53,6 +64,12 @@ namespace Api.Services
         public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, MaterialRequest model, int modifiedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
+
+            if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.CategoryId.Value))
+            {
+                response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+                return response;
+            }
 
             // Fetch the existing object
             var material = await _materialEntityService.GetEntityOrDefaultAsync(id, tenantId);

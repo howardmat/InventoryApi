@@ -24,12 +24,14 @@ namespace Api.Services
 
             if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.MaterialId.Value))
             {
-                response.SetError($"MaterialId is invalid");
+                response.SetNotFound($"MaterialId [{model.MaterialId}] is invalid");
+                return response;
             }
 
             if (!await _formulaAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.FormulaId.Value))
             {
-                response.SetError($"FormulaId is invalid");
+                response.SetNotFound($"FormulaId [{model.FormulaId}] is invalid");
+                return response;
             }
 
             response.Data = await _formulaIngredientEntityService.CreateAsync(model.FormulaId.Value, model.MaterialId.Value, model.Quantity.Value, createdByUserId);

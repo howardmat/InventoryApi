@@ -2,6 +2,7 @@
 
 namespace Api.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ApiController]
     public class ErrorController : InventoryControllerBase
     {

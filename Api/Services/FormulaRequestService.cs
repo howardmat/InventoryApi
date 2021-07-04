@@ -13,15 +13,18 @@ namespace Api.Services
         private readonly ILogger<FormulaRequestService> _logger;
         private readonly FormulaEntityService _formulaEntityService;
         private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+        private readonly ResourceAuthorization<CategoryAuthorizationProvider> _categoryAuthorizationProvider;
 
         public FormulaRequestService(
             ILogger<FormulaRequestService> logger,
             FormulaEntityService formulaEntityService,
-            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
+            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider,
+            ResourceAuthorization<CategoryAuthorizationProvider> categoryAuthorizationProvider)
         {
             _logger = logger;
             _formulaEntityService = formulaEntityService;
             _materialAuthorizationProvider = materialAuthorizationProvider;
+            _categoryAuthorizationProvider = categoryAuthorizationProvider;
         }
 
         public async Task<ResponseHandler<IEnumerable<FormulaModel>>> ProcessListRequestAsync(int tenantId)
@@ -50,6 +53,12 @@ namespace Api.Services
         {
             var response = new ResponseHandler<FormulaModel>();
 
+            if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.CategoryId.Value))
+            {
+                response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+                return response;
+            }
+
             foreach (var ingredient in model.Ingredients)
             {
                 // Ensure MaterialId belongs to Tenant
@@ -57,7 +66,7 @@ namespace Api.Services
                 {
                     _logger.LogError("FormulaRequestService.ProcessCreateRequestAsync - Failed due to MaterialId included in Ingredients collection. Tenant does not have access or MaterialId is invalid, MaterialId: [{MaterialId}]", ingredient.MaterialId);
 
-                    // An invalid MaterialId was passed in - request should fail
+                    response.SetNotFound($"MaterialId [{ingredient.MaterialId}] is invalid");
                     return response;
                 }
             }
@@ -74,6 +83,12 @@ namespace Api.Services
         public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, FormulaRequest model, int modifiedByUserId, int tenantId)
         {
             var response = new ResponseHandler();
+
+            if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, model.CategoryId.Value))
+            {
+                response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+                return response;
+            }
 
             // Fetch the existing object
             var formula = await _formulaEntityService.GetEntityOrDefaultAsync(id, tenantId);
