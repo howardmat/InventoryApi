@@ -1,3 +1,4 @@
+using Api.Authorization;
 using Api.Claims;
 using Api.Extensions;
 using Data;
@@ -36,7 +37,7 @@ namespace Api
                 options.UseSqlServer(
                     _configuration.GetConnectionString("DefaultConnection"));
 
-                options.LogTo(Console.WriteLine);
+                //options.LogTo(Console.WriteLine);
             });
 
             services.AddInventoryProfilesForAutoMapper();
@@ -56,6 +57,12 @@ namespace Api
                     };
                 });
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("IsAdmin", policy =>
+                    policy.Requirements.Add(new IsAdminAuthorizationRequirement()));
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -63,6 +70,8 @@ namespace Api
             });
 
             services.AddInventoryUnitOfWork();
+
+            services.AddInventoryAuthorizationServices();
 
             services.AddInventoryApplicationServices();
 

@@ -3,6 +3,7 @@ using Api.Models.MapProfiles;
 using Api.Services;
 using Api.Validation.Validators;
 using Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Api.Extensions
@@ -14,14 +15,22 @@ namespace Api.Extensions
             services.AddScoped<IUnitOfWork, InventoryUnitOfWork>();
         }
 
-        public static void AddInventoryApplicationServices(this IServiceCollection services)
+        public static void AddInventoryAuthorizationServices(this IServiceCollection services)
         {
+            services.AddSingleton<IAuthorizationHandler, IsAdminHandler>();
+
             services.AddTransient<AuthenticationDetailService>();
-            services.AddTransient<ResourceAuthorization<MaterialAuthorizationProvider>>();
-            services.AddTransient<MaterialAuthorizationProvider>();
+
+            services.AddTransient<ResourceAuthorization<CategoryAuthorizationProvider>>();
+            services.AddTransient<CategoryAuthorizationProvider>();
             services.AddTransient<ResourceAuthorization<FormulaAuthorizationProvider>>();
             services.AddTransient<FormulaAuthorizationProvider>();
+            services.AddTransient<ResourceAuthorization<MaterialAuthorizationProvider>>();
+            services.AddTransient<MaterialAuthorizationProvider>();
+        }
 
+        public static void AddInventoryApplicationServices(this IServiceCollection services)
+        {
             services.AddTransient<CategoryEntityService>();
             services.AddTransient<CategoryRequestService>();
 

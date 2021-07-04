@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Api.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "IsAdmin")]
     [Route("/tenant")]
     [ApiController]
     public class TenantController : InventoryControllerBase
