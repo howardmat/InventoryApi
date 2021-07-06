@@ -4,9 +4,10 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public int CategoryId { get; set; }
-        public int UnitOfMeasurementId { get; set; }
         public string Description { get; set; }
         public string ImageFilename { get; set; }
+
+        public CategoryModel Category { get; set; }
+        public UnitOfMeasurementModel UnitOfMeasurement { get; set; }
     }
 }

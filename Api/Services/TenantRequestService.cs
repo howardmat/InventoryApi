@@ -52,7 +52,7 @@ namespace Api.Services
             return response;
         }
 
-        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, TenantModel model, int modifiedByUserId)
+        public async Task<ResponseHandler> ProcessUpdateRequestAsync(int id, TenantRequest model, int modifiedByUserId)
         {
             var response = new ResponseHandler();
 

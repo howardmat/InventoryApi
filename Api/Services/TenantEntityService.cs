@@ -103,7 +103,7 @@ namespace Api.Services
             return newModel;
         }
 
-        public async Task<bool> UpdateAsync(Tenant tenant, TenantModel model, int modifyingUserId)
+        public async Task<bool> UpdateAsync(Tenant tenant, TenantRequest model, int modifyingUserId)
         {
             var now = DateTime.UtcNow;
 

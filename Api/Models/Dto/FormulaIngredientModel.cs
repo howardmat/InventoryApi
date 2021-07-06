@@ -2,8 +2,9 @@
 {
     public class FormulaIngredientModel
     {
-        public virtual MaterialModel Material { get; set; }
-
+        public int Id { get; set; }
         public decimal Quantity { get; set; }
+
+        public virtual MaterialModel Material { get; set; }
     }
 }
