@@ -13,6 +13,7 @@ namespace Data
         IMaterialRepository MaterialRepository { get; }
         IMaterialInventoryTransactionRepository MaterialInventoryTransactionRepository { get; }
         IProductRepository ProductRepository { get; }
+        IProductInventoryTransactionRepository ProductInventoryTransactionRepository { get; }
         IProvinceRepository ProvinceRepository { get; }
         ITenantRepository TenantRepository { get; }
         IUnitOfMeasurementRepository UnitOfMeasurementRepository { get; }

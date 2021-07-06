@@ -11,15 +11,15 @@ namespace Api.Controllers
     [Authorize]
     [Route("/material/inventory")]
     [ApiController]
-    public class MaterialTransactionController : InventoryControllerBase
+    public class MaterialInventoryController : InventoryControllerBase
     {
-        private readonly MaterialTransactionRequestService _materialTransactionRequestService;
+        private readonly MaterialInventoryRequestService _materialInventoryRequestService;
 
-        public MaterialTransactionController(
-            MaterialTransactionRequestService materialTransactionRequestService,
+        public MaterialInventoryController(
+            MaterialInventoryRequestService materialInventoryRequestService,
             AuthenticationDetailService authDetailService) : base(authDetailService)
         {
-            _materialTransactionRequestService = materialTransactionRequestService;
+            _materialInventoryRequestService = materialInventoryRequestService;
         }
 
         [HttpGet("{id}")]
@@ -27,7 +27,7 @@ namespace Api.Controllers
         {
             var tenantId = GetCurrentTenantId(User);
 
-            var result = await _materialTransactionRequestService.ProcessGetRequestAsync(id, tenantId);
+            var result = await _materialInventoryRequestService.ProcessGetRequestAsync(id, tenantId);
             return result.ToActionResult();
         }
 
@@ -37,7 +37,7 @@ namespace Api.Controllers
         {
             var tenantId = GetCurrentTenantId(User);
 
-            var result = await _materialTransactionRequestService.ProcessListRequestAsync(materialId, tenantId);
+            var result = await _materialInventoryRequestService.ProcessListRequestAsync(materialId, tenantId);
             return result.ToActionResult();
         }
 
@@ -47,9 +47,9 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
-            var result = await _materialTransactionRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
+            var result = await _materialInventoryRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
             return result.ToActionResult(
-                Url.Action("Get", "MaterialTransaction", new { id = result.Data?.Id }));
+                Url.Action("Get", "MaterialInventory", new { id = result.Data?.Id }));
         }
 
         [HttpDelete("{id}")]
@@ -58,7 +58,7 @@ namespace Api.Controllers
             var userId = await GetCurrentUserIdAsync(User);
             var tenantId = GetCurrentTenantId(User);
 
-            var result = await _materialTransactionRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
+            var result = await _materialInventoryRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
             return result.ToActionResult();
         }
     }

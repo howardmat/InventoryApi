@@ -43,7 +43,7 @@ namespace Api.Extensions
             services.AddTransient<MaterialEntityService>();
             services.AddTransient<MaterialInventoryTransactionService>();
             services.AddTransient<MaterialRequestService>();
-            services.AddTransient<MaterialTransactionRequestService>();
+            services.AddTransient<MaterialInventoryRequestService>();
 
             services.AddTransient<ProductEntityService>();
             services.AddTransient<ProductRequestService>();

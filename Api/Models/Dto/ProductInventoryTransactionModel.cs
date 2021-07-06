@@ -1,10 +1,9 @@
-﻿namespace Data.Models
+﻿namespace Api.Models.Dto
 {
-    public class ProductInventoryTransaction : TenantInventoryBaseModel
+    public class ProductInventoryTransactionModel
     {
+        public int Id { get; set; }
         public int ProductId { get; set; }
-        public virtual Product Product { get; set; }
-
         public int? OrderDetailId { get; set; }
         public decimal Quantity { get; set; }
         public string Description { get; set; }

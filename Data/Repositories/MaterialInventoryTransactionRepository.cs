@@ -29,7 +29,6 @@ namespace Data.Repositories
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.Id == id)
                 .FirstOrDefaultAsync();
-                        
         }
     }
 }

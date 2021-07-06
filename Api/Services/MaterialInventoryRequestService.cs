@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class MaterialTransactionRequestService
+    public class MaterialInventoryRequestService
     {
         private readonly MaterialInventoryTransactionService _materialInventoryTransactionService;
         private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
 
-        public MaterialTransactionRequestService(
+        public MaterialInventoryRequestService(
             MaterialInventoryTransactionService materialInventoryTransactionService,
             ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
         {
