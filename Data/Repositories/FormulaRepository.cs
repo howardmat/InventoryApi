@@ -19,6 +19,11 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .OrderBy(f => f.Name)
+                .Include(f => f.Ingredients)
+                .ThenInclude(i => i.Material.UnitOfMeasurement)
+                .Include(f => f.Ingredients)
+                .ThenInclude(i => i.Material.Category)
+                .Include(f => f.Category)
                 .ToListAsync();
         }
 
@@ -29,6 +34,11 @@ namespace Data.Repositories
                 .WhereBelongsToTenant(tenantId)
                 .Where(f => f.Id == id)
                 .OrderBy(f => f.Name)
+                .Include(f => f.Ingredients)
+                .ThenInclude(i => i.Material.UnitOfMeasurement)
+                .Include(f => f.Ingredients)
+                .ThenInclude(i => i.Material.Category)
+                .Include(f => f.Category)
                 .FirstOrDefaultAsync();
         }
     }

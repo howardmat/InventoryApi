@@ -29,7 +29,7 @@ namespace Api.Controllers
         [HttpGet("/country/{countryIsoCode}/province/{isoCode}")]
         public async Task<ActionResult<ProvinceModel>> GetByCode(string countryIsoCode, string isoCode)
         {
-            var result = await _provinceService.ProcessGetRequestAsync(isoCode, countryIsoCode);
+            var result = await _provinceService.ProcessGetRequestAsync(countryIsoCode, isoCode);
             return result.ToActionResult();
         }
     }

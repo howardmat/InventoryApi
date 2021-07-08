@@ -16,6 +16,7 @@ namespace Data.Repositories
             return await _context.Province
                 .Where(p => p.CountryIsoCode.ToLower() == countryCode.ToLower())
                 .Where(p => p.IsoCode.ToLower() == provinceCode.ToLower())
+                .Include(p => p.Country)
                 .FirstOrDefaultAsync();
         }
 
@@ -25,6 +26,7 @@ namespace Data.Repositories
                 .Where(p => p.CountryIsoCode.ToLower() == countryCode.ToLower())
                 .OrderBy(p => p.DisplayOrder)
                 .ThenBy(p => p.Name)
+                .Include(p => p.Country)
                 .ToListAsync();
         }
     }
