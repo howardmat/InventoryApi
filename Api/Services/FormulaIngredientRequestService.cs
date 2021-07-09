@@ -13,9 +13,13 @@ namespace Api.Services
         private readonly ResourceAuthorization<FormulaAuthorizationProvider> _formulaAuthorizationProvider;
 
         public FormulaIngredientRequestService(
-            FormulaIngredientEntityService formulaIngredientEntityService)
+            FormulaIngredientEntityService formulaIngredientEntityService,
+            ResourceAuthorization<FormulaAuthorizationProvider> formulaAuthorizationProvider,
+            ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider)
         {
             _formulaIngredientEntityService = formulaIngredientEntityService;
+            _materialAuthorizationProvider = materialAuthorizationProvider;
+            _formulaAuthorizationProvider = formulaAuthorizationProvider;
         }
 
         public async Task<ResponseHandler<FormulaIngredientModel>> ProcessCreateRequestAsync(FormulaIngredientRequest model, int createdByUserId, int tenantId)

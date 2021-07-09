@@ -39,11 +39,13 @@ namespace Api.Extensions
 
             services.AddTransient<FormulaEntityService>();
             services.AddTransient<FormulaRequestService>();
+            services.AddTransient<FormulaIngredientEntityService>();
+            services.AddTransient<FormulaIngredientRequestService>();
 
             services.AddTransient<MaterialEntityService>();
-            services.AddTransient<MaterialInventoryTransactionService>();
             services.AddTransient<MaterialRequestService>();
             services.AddTransient<MaterialInventoryRequestService>();
+            services.AddTransient<MaterialInventoryTransactionService>();
 
             services.AddTransient<ProductEntityService>();
             services.AddTransient<ProductRequestService>();
@@ -66,12 +68,13 @@ namespace Api.Extensions
 
         public static void AddInventoryValidators(this IServiceCollection services)
         {
+            services.AddTransient<FormulaIngredientRequestValidator>();
             services.AddTransient<FormulaRequestValidator>();
-            services.AddTransient<UserRequestValidator>();
             services.AddTransient<MaterialRequestValidator>();
-            services.AddTransient<RegisterUserRequestValidator>();
             services.AddTransient<RegisterCompanyRequestValidator>();
+            services.AddTransient<RegisterUserRequestValidator>();
             services.AddTransient<TenantRequestValidator>();
+            services.AddTransient<UserRequestValidator>();
         }
 
         public static void AddInventoryProfilesForAutoMapper(this IServiceCollection services)

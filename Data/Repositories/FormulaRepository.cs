@@ -19,7 +19,8 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .OrderBy(f => f.Name)
-                .Include(f => f.Ingredients)
+                .Include(f => f.Ingredients
+                    .Where(i => !i.DeletedUtc.HasValue))
                 .ThenInclude(i => i.Material.UnitOfMeasurement)
                 .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.Category)
@@ -34,7 +35,8 @@ namespace Data.Repositories
                 .WhereBelongsToTenant(tenantId)
                 .Where(f => f.Id == id)
                 .OrderBy(f => f.Name)
-                .Include(f => f.Ingredients)
+                .Include(f => f.Ingredients
+                    .Where(i => !i.DeletedUtc.HasValue))
                 .ThenInclude(i => i.Material.UnitOfMeasurement)
                 .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.Category)
