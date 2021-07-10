@@ -103,9 +103,7 @@ namespace Api.Services
             // Set response
             if (await _unitOfWork.CompleteAsync() > 0)
             {
-                formula = await _unitOfWork.FormulaRepository.GetAsync(formula.Id, tenantId);
-
-                newModel = _mapper.Map<FormulaModel>(formula);
+                newModel = await GetModelOrDefaultAsync(formula.Id, tenantId);
             }
 
             return newModel;

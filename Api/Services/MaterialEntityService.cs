@@ -85,7 +85,7 @@ namespace Api.Services
             // Set response
             if (await _unitOfWork.CompleteAsync() > 0)
             {
-                newModel = _mapper.Map<MaterialModel>(material);
+                newModel = await GetModelOrDefaultAsync(material.Id, tenantId);
             }
 
             return newModel;

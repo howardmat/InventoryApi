@@ -19,6 +19,8 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .OrderBy(m => m.Name)
+                .Include(m => m.Category)
+                .Include(m => m.UnitOfMeasurement)
                 .ToListAsync();
         }
 
@@ -28,6 +30,8 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(p => p.Id == id)
+                .Include(m => m.Category)
+                .Include(m => m.UnitOfMeasurement)
                 .FirstOrDefaultAsync();
         }
     }
