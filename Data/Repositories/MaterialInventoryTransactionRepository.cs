@@ -19,6 +19,8 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.MaterialId == materialId)
+                .Include(m => m.Material.Category)
+                .Include(m => m.Material.UnitOfMeasurement)
                 .ToListAsync();
         }
 
@@ -28,6 +30,8 @@ namespace Data.Repositories
                 .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.Id == id)
+                .Include(m => m.Material.Category)
+                .Include(m => m.Material.UnitOfMeasurement)
                 .FirstOrDefaultAsync();
         }
     }

@@ -85,7 +85,7 @@ namespace Api.Services
             // Set response
             if (await _unitOfWork.CompleteAsync() > 0)
             {
-                newModel = _mapper.Map<ProductModel>(product);
+                newModel = await GetModelOrDefaultAsync(product.Id, tenantId);
             }
 
             return newModel;

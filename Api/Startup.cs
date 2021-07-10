@@ -37,7 +37,7 @@ namespace Api
                 options.UseSqlServer(
                     _configuration.GetConnectionString("DefaultConnection"));
 
-                options.LogTo(Console.WriteLine);
+                //options.LogTo(Console.WriteLine);
             });
 
             services.AddInventoryProfilesForAutoMapper();

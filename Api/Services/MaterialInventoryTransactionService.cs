@@ -85,7 +85,7 @@ namespace Api.Services
             // Set response
             if (await _unitOfWork.CompleteAsync() > 0)
             {
-                newModel = _mapper.Map<MaterialInventoryTransactionModel>(transaction);
+                newModel = await GetModelOrDefaultAsync(transaction.Id, tenantId);
             }
 
             return newModel;

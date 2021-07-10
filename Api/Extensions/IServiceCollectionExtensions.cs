@@ -23,10 +23,15 @@ namespace Api.Extensions
 
             services.AddTransient<ResourceAuthorization<CategoryAuthorizationProvider>>();
             services.AddTransient<CategoryAuthorizationProvider>();
+            
             services.AddTransient<ResourceAuthorization<FormulaAuthorizationProvider>>();
             services.AddTransient<FormulaAuthorizationProvider>();
+            
             services.AddTransient<ResourceAuthorization<MaterialAuthorizationProvider>>();
             services.AddTransient<MaterialAuthorizationProvider>();
+
+            services.AddTransient<ResourceAuthorization<ProductAuthorizationProvider>>();
+            services.AddTransient<ProductAuthorizationProvider>();
         }
 
         public static void AddInventoryApplicationServices(this IServiceCollection services)
@@ -49,6 +54,8 @@ namespace Api.Extensions
 
             services.AddTransient<ProductEntityService>();
             services.AddTransient<ProductRequestService>();
+            services.AddTransient<ProductInventoryRequestService>();
+            services.AddTransient<ProductInventoryTransactionService>();
 
             services.AddTransient<ProvinceEntityService>();
             services.AddTransient<ProvinceRequestService>();
@@ -71,6 +78,7 @@ namespace Api.Extensions
             services.AddTransient<FormulaIngredientRequestValidator>();
             services.AddTransient<FormulaRequestValidator>();
             services.AddTransient<MaterialRequestValidator>();
+            services.AddTransient<ProductRequestValidator>();
             services.AddTransient<RegisterCompanyRequestValidator>();
             services.AddTransient<RegisterUserRequestValidator>();
             services.AddTransient<TenantRequestValidator>();
