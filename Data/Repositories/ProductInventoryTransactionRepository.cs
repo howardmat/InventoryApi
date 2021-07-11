@@ -16,18 +16,20 @@ namespace Data.Repositories
         public async Task<IEnumerable<ProductInventoryTransaction>> ListAsync(int productId, int tenantId)
         {
             return await _context.ProductInventoryTransaction
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.ProductId == productId)
+                .Include(p => p.Product.Category)
+                .Include(p => p.Product.UnitOfMeasurement)
                 .ToListAsync();
         }
 
         public async Task<ProductInventoryTransaction> GetAsync(int id, int tenantId)
         {
             return await _context.ProductInventoryTransaction
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.Id == id)
+                .Include(p => p.Product.Category)
+                .Include(p => p.Product.UnitOfMeasurement)
                 .FirstOrDefaultAsync();
         }
     }

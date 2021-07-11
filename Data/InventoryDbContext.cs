@@ -41,7 +41,7 @@ namespace Data
                 e.HasOne(u => u.Country)
                     .WithMany()
                     .HasForeignKey(u => u.CountryIsoCode)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<Category>(e =>
@@ -54,6 +54,11 @@ namespace Data
 
             builder.Entity<Formula>(e =>
             {
+                e.HasOne(u => u.Category)
+                   .WithMany()
+                   .HasForeignKey(u => u.CategoryId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
                 e.HasOne(u => u.Tenant)
                     .WithMany()
                     .HasForeignKey(u => u.TenantId)
@@ -71,6 +76,16 @@ namespace Data
 
             builder.Entity<Material>(e =>
             {
+                e.HasOne(u => u.Category)
+                   .WithMany()
+                   .HasForeignKey(u => u.CategoryId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+                e.HasOne(u => u.UnitOfMeasurement)
+                   .WithMany()
+                   .HasForeignKey(u => u.UnitOfMeasurementId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
                 e.HasOne(u => u.Tenant)
                     .WithMany()
                     .HasForeignKey(u => u.TenantId)
@@ -91,6 +106,21 @@ namespace Data
             builder.Entity<Product>(e =>
             {
                 e.Property(f => f.Price).HasPrecision(19, 4);
+
+                e.HasOne(u => u.Category)
+                   .WithMany()
+                   .HasForeignKey(u => u.CategoryId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+                e.HasOne(u => u.Formula)
+                   .WithMany()
+                   .HasForeignKey(u => u.FormulaId)
+                   .OnDelete(DeleteBehavior.SetNull);
+
+                e.HasOne(u => u.UnitOfMeasurement)
+                   .WithMany()
+                   .HasForeignKey(u => u.UnitOfMeasurementId)
+                   .OnDelete(DeleteBehavior.SetNull);
 
                 e.HasOne(u => u.Tenant)
                    .WithMany()
@@ -123,11 +153,12 @@ namespace Data
                 e.HasOne(u => u.OwnerUser)
                     .WithMany()
                     .HasForeignKey(u => u.OwnerUserId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                    .OnDelete(DeleteBehavior.SetNull);
 
                 e.HasOne(u => u.PrimaryAddress)
                     .WithMany()
-                    .HasForeignKey(u => u.PrimaryAddressId);
+                    .HasForeignKey(u => u.PrimaryAddressId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             builder.Entity<UserProfile>(e =>

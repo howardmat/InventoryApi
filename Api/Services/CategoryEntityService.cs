@@ -3,6 +3,7 @@ using AutoMapper;
 using Data;
 using Data.Enums;
 using Data.Models;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,7 +17,8 @@ namespace Api.Services
 
         public CategoryEntityService(
             IUnitOfWork unitOfWork,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<CategoryEntityService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -103,11 +105,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(Category category, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            category.DeletedUserId = modifyingUserId;
-            category.DeletedUtc = now;
+            _unitOfWork.CategoryRepository.Remove(category);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

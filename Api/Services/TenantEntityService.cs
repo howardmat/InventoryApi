@@ -140,11 +140,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(Tenant tenant, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            tenant.DeletedUserId = modifyingUserId;
-            tenant.DeletedUtc = now;
+            _unitOfWork.TenantRepository.Remove(tenant);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

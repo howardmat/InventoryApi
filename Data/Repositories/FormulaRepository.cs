@@ -16,11 +16,9 @@ namespace Data.Repositories
         public async Task<IEnumerable<Formula>> ListAsync(int tenantId)
         {
             return await _context.Formula
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .OrderBy(f => f.Name)
-                .Include(f => f.Ingredients
-                    .Where(i => !i.DeletedUtc.HasValue))
+                .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.UnitOfMeasurement)
                 .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.Category)
@@ -31,12 +29,10 @@ namespace Data.Repositories
         public async Task<Formula> GetAsync(int id, int tenantId)
         {
             return await _context.Formula
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(f => f.Id == id)
                 .OrderBy(f => f.Name)
-                .Include(f => f.Ingredients
-                    .Where(i => !i.DeletedUtc.HasValue))
+                .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.UnitOfMeasurement)
                 .Include(f => f.Ingredients)
                 .ThenInclude(i => i.Material.Category)

@@ -105,11 +105,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(UserProfile user, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            user.DeletedUserId = modifyingUserId;
-            user.DeletedUtc = now;
+            _unitOfWork.UserRepository.Remove(user);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

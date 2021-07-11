@@ -13,8 +13,5 @@ namespace Data.Models
 
         public int? LastModifiedUserId { get; set; }
         public DateTime LastModifiedUtc { get; set; }
-
-        public int? DeletedUserId { get; set; }
-        public DateTime? DeletedUtc { get; set; }
     }
 }

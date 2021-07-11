@@ -16,7 +16,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<UnitOfMeasurement>> ListAsync()
         {
             return await _context.UnitOfMeasurement
-                .WhereNotDeleted()
                 .OrderBy(m => m.Name)
                 .ToListAsync();
         }
@@ -24,7 +23,6 @@ namespace Data.Repositories
         public async Task<UnitOfMeasurement> GetAsync(int id)
         {
             return await _context.UnitOfMeasurement
-                .WhereNotDeleted()
                 .Where(u => u.Id == id)
                 .OrderBy(m => m.Name)
                 .FirstOrDefaultAsync();

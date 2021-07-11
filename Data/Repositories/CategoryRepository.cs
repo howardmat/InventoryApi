@@ -16,7 +16,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<Category>> ListAsync(CategoryType categoryType, int tenantId)
         {
             return await _context.Category
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(c => c.Type == categoryType)
                 .OrderBy(c => c.Name)
@@ -26,7 +25,6 @@ namespace Data.Repositories
         public async Task<Category> GetAsync(int id, int tenantId)
         {
             return await _context.Category
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
@@ -35,7 +33,6 @@ namespace Data.Repositories
         public async Task<Category> GetByIdAsync(int id)
         {
             return await _context.Category
-                .WhereNotDeleted()
                 .Where(c => c.Id == id)
                 .FirstOrDefaultAsync();
         }

@@ -5,7 +5,7 @@ namespace Data.Models
 {
     public class Formula : TenantInventoryBaseModel
     {
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [MaxLength(256)]

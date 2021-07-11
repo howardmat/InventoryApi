@@ -15,7 +15,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<Tenant>> ListAsync()
         {
             return await _context.Tenant
-                .WhereNotDeleted()
                 .OrderBy(p => p.CompanyName)
                 .ToListAsync();
         }
@@ -23,7 +22,6 @@ namespace Data.Repositories
         public async Task<Tenant> GetAsync(int id)
         {
             return await _context.Tenant
-                .WhereNotDeleted()
                 .Where(t => t.Id == id)
                 .Include(t => t.PrimaryAddress.Country)
                 .Include(t => t.PrimaryAddress.Province)
@@ -33,7 +31,6 @@ namespace Data.Repositories
         public async Task<Tenant> FindByOwnerIdAsync(int ownerUserId)
         {
             return await _context.Tenant
-                .WhereNotDeleted()
                 .Where(t => t.OwnerUserId == ownerUserId)
                 .FirstOrDefaultAsync();
         }

@@ -4,10 +4,10 @@ namespace Data.Models
 {
     public class Material : TenantInventoryBaseModel
     {
-        public int UnitOfMeasurementId { get; set; }
+        public int? UnitOfMeasurementId { get; set; }
         public virtual UnitOfMeasurement UnitOfMeasurement { get; set; }
 
-        public int CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public virtual Category Category { get; set; }
 
         [MaxLength(256)]

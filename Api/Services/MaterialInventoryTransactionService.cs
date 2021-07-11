@@ -93,11 +93,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(MaterialInventoryTransaction materialTransaction, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            materialTransaction.DeletedUserId = modifyingUserId;
-            materialTransaction.DeletedUtc = now;
+            _unitOfWork.MaterialInventoryTransactionRepository.Remove(materialTransaction);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

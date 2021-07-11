@@ -1,5 +1,4 @@
-﻿using Data.Extensions;
-using Data.Models;
+﻿using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<UserProfile>> ListAsync()
         {
             return await _context.UserProfile
-                .WhereNotDeleted()
                 .OrderBy(u => u.Email)
                 .ToListAsync();
         }
@@ -23,7 +21,6 @@ namespace Data.Repositories
         public async Task<UserProfile> FindByEmailAsync(string email)
         {
             return await _context.UserProfile
-                .WhereNotDeleted()
                 .Where(u => u.Email.ToLower() == email.ToLower())
                 .FirstOrDefaultAsync();
         }
@@ -31,7 +28,6 @@ namespace Data.Repositories
         public async Task<UserProfile> FindByLocalIdAsync(string localId)
         {
             return await _context.UserProfile
-                .WhereNotDeleted()
                 .Where(u => u.LocalId.ToLower() == localId.ToLower())
                 .FirstOrDefaultAsync();
         }
@@ -39,7 +35,6 @@ namespace Data.Repositories
         public async Task<UserProfile> GetAsync(int id)
         {
             return await _context.UserProfile
-                .WhereNotDeleted()
                 .Where(u => u.Id == id)
                 .FirstOrDefaultAsync();
         }

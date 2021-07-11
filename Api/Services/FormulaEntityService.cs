@@ -126,11 +126,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(Formula formula, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            formula.DeletedUserId = modifyingUserId;
-            formula.DeletedUtc = now;
+            _unitOfWork.FormulaRepository.Remove(formula);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

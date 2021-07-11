@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    partial class InventoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210711004823_Updating nullable FK properties")]
+    partial class UpdatingnullableFKproperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -990,7 +992,7 @@ namespace Data.Migrations
                     b.HasOne("Data.Models.Country", "Country")
                         .WithMany()
                         .HasForeignKey("CountryIsoCode")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Data.Models.Province", "Province")
                         .WithMany()
@@ -1017,8 +1019,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("Data.Models.Tenant", "Tenant")
                         .WithMany()
@@ -1054,8 +1055,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("Data.Models.Tenant", "Tenant")
                         .WithMany()
@@ -1065,8 +1065,7 @@ namespace Data.Migrations
 
                     b.HasOne("Data.Models.UnitOfMeasurement", "UnitOfMeasurement")
                         .WithMany()
-                        .HasForeignKey("UnitOfMeasurementId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("UnitOfMeasurementId");
 
                     b.Navigation("Category");
 
@@ -1098,13 +1097,11 @@ namespace Data.Migrations
                 {
                     b.HasOne("Data.Models.Category", "Category")
                         .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("CategoryId");
 
                     b.HasOne("Data.Models.Formula", "Formula")
                         .WithMany()
-                        .HasForeignKey("FormulaId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("FormulaId");
 
                     b.HasOne("Data.Models.Tenant", "Tenant")
                         .WithMany()
@@ -1114,8 +1111,7 @@ namespace Data.Migrations
 
                     b.HasOne("Data.Models.UnitOfMeasurement", "UnitOfMeasurement")
                         .WithMany()
-                        .HasForeignKey("UnitOfMeasurementId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("UnitOfMeasurementId");
 
                     b.Navigation("Category");
 
@@ -1161,12 +1157,11 @@ namespace Data.Migrations
                     b.HasOne("Data.Models.UserProfile", "OwnerUser")
                         .WithMany()
                         .HasForeignKey("OwnerUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Data.Models.Address", "PrimaryAddress")
                         .WithMany()
-                        .HasForeignKey("PrimaryAddressId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .HasForeignKey("PrimaryAddressId");
 
                     b.Navigation("OwnerUser");
 

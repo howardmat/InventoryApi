@@ -16,6 +16,8 @@ namespace Data.Repositories
             return await _context.FormulaIngredient
                 .Where(fi => fi.Id == id)
                 .Where(fi => fi.Formula.TenantId == tenantId)
+                .Include(fi => fi.Formula)
+                .Include(fi => fi.Material)
                 .FirstOrDefaultAsync();
         }
     }

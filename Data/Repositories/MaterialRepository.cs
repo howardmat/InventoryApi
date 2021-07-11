@@ -15,7 +15,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<Material>> ListAsync(int tenantId)
         {
             return await _context.Material
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .OrderBy(m => m.Name)
                 .Include(m => m.Category)
@@ -26,7 +25,6 @@ namespace Data.Repositories
         public async Task<Material> GetAsync(int id, int tenantId)
         {
             return await _context.Material
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.Id == id)
                 .Include(m => m.Category)

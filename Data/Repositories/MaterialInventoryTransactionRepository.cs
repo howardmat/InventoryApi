@@ -16,7 +16,6 @@ namespace Data.Repositories
         public async Task<IEnumerable<MaterialInventoryTransaction>> ListAsync(int materialId, int tenantId)
         {
             return await _context.MaterialInventoryTransaction
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.MaterialId == materialId)
                 .Include(m => m.Material.Category)
@@ -27,7 +26,6 @@ namespace Data.Repositories
         public async Task<MaterialInventoryTransaction> GetAsync(int id, int tenantId)
         {
             return await _context.MaterialInventoryTransaction
-                .WhereNotDeleted()
                 .WhereBelongsToTenant(tenantId)
                 .Where(m => m.Id == id)
                 .Include(m => m.Material.Category)

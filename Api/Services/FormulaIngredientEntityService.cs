@@ -58,11 +58,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(FormulaIngredient formulaIngredient, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            formulaIngredient.DeletedUserId = modifyingUserId;
-            formulaIngredient.DeletedUtc = now;
+            _unitOfWork.FormulaIngredientRepository.Remove(formulaIngredient);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 

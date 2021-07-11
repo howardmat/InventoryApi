@@ -113,11 +113,7 @@ namespace Api.Services
 
         public async Task<bool> DeleteAsync(UnitOfMeasurement unitOfMeasurement, int modifyingUserId)
         {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            unitOfMeasurement.DeletedUserId = modifyingUserId;
-            unitOfMeasurement.DeletedUtc = now;
+            _unitOfWork.UnitOfMeasurementRepository.Remove(unitOfMeasurement);
 
             var success = await _unitOfWork.CompleteAsync() > 0;
 
