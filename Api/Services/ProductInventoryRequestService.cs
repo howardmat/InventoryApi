@@ -24,6 +24,12 @@ namespace Api.Services
         {
             var response = new ResponseHandler<IEnumerable<ProductInventoryTransactionModel>>();
 
+            if (!await _productAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, productId))
+            {
+                response.SetNotFound($"ProductId [{productId}] is invalid");
+                return response;
+            }
+
             response.Data = await _productInventoryTransactionService.ListAsync(productId, tenantId);
 
             return response;

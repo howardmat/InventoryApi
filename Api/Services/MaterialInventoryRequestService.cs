@@ -24,6 +24,12 @@ namespace Api.Services
         {
             var response = new ResponseHandler<IEnumerable<MaterialInventoryTransactionModel>>();
 
+            if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, materialId))
+            {
+                response.SetNotFound($"MaterialId [{materialId}] is invalid");
+                return response;
+            }
+
             response.Data = await _materialInventoryTransactionService.ListAsync(materialId, tenantId);
 
             return response;
