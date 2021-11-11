@@ -17,10 +17,10 @@ namespace Api
 {
     public class Startup
     {
-        private IConfiguration _configuration;
-        private string _firebaseApiUrl;
-        private string _firebaseProjectId;
-        private string _secureTokenUrl;
+        private readonly IConfiguration _configuration;
+        private readonly string _firebaseApiUrl;
+        private readonly string _firebaseProjectId;
+        private readonly string _secureTokenUrl;
 
         public Startup(IConfiguration configuration)
         {
