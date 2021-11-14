@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using System.Collections.Generic;
@@ -19,8 +20,10 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProvinceModel>> ListAsync(string countryCode)
+        public async Task<ServiceResult<IEnumerable<ProvinceModel>>> ListAsync(string countryCode)
         {
+            var response = new ServiceResult<IEnumerable<ProvinceModel>>();
+
             // Fetch data
             var data = await _unitOfWork.ProvinceRepository.ListAsync(countryCode);
 
@@ -31,16 +34,20 @@ namespace Api.Services
                 list.Add(_mapper.Map<ProvinceModel>(item));
             }
 
-            return list;
+            response.Data = list;
+
+            return response;
         }
 
-        public async Task<ProvinceModel> GetAsync(string countryIsoCode, string provinceCode)
+        public async Task<ServiceResult<ProvinceModel>> GetAsync(string countryIsoCode, string provinceCode)
         {
+            var response = new ServiceResult<ProvinceModel>();
+
             // Fetch data
             var item = await _unitOfWork.ProvinceRepository.GetAsync(countryIsoCode, provinceCode);
-            var model = _mapper.Map<ProvinceModel>(item);
+            response.Data = _mapper.Map<ProvinceModel>(item);
 
-            return model;
+            return response;
         }
     }
 }

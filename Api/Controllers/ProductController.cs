@@ -14,33 +14,33 @@ namespace Api.Controllers
     [ApiController]
     public class ProductController : InventoryControllerBase
     {
-        private readonly ProductRequestService _productRequestService;
+        private readonly ProductEntityService _productEntityService;
         private readonly ProductRequestValidator _productRequestValidator;
 
         public ProductController(
-            ProductRequestService productRequestService,
+            ProductEntityService productEntityService,
             ProductRequestValidator productRequestValidator,
             AuthenticationDetailService authDetailService) : base(authDetailService)
         {
-            _productRequestService = productRequestService;
+            _productEntityService = productEntityService;
             _productRequestValidator = productRequestValidator;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductModel>>> Get()
         {
-            var tenantId = GetCurrentTenantId(User);
+            var user = await GetCurrentUserAsync(User);
 
-            var result = await _productRequestService.ProcessListRequestAsync(tenantId);
+            var result = await _productEntityService.ListAsync(user.TenantId.Value);
             return result.ToActionResult();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductModel>> Get(int id)
         {
-            var tenantId = GetCurrentTenantId(User);
+            var user = await GetCurrentUserAsync(User);
 
-            var result = await _productRequestService.ProcessGetRequestAsync(id, tenantId);
+            var result = await _productEntityService.GetModelOrDefaultAsync(id, user.TenantId.Value);
             return result.ToActionResult();
         }
 
@@ -50,10 +50,9 @@ namespace Api.Controllers
             if (!await _productRequestValidator.IsValidAsync(model))
                 return _productRequestValidator.ServiceResponse.ToActionResult();
 
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+            var user = await GetCurrentUserAsync(User);
 
-            var result = await _productRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
+            var result = await _productEntityService.CreateAsync(model, user);
             return result.ToActionResult(
                 Url.Action("Get", "Product", new { id = result.Data?.Id }));
         }
@@ -64,20 +63,18 @@ namespace Api.Controllers
             if (!await _productRequestValidator.IsValidAsync(model))
                 return _productRequestValidator.ServiceResponse.ToActionResult();
 
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+            var user = await GetCurrentUserAsync(User);
 
-            var result = await _productRequestService.ProcessUpdateRequestAsync(id, model, userId, tenantId);
+            var result = await _productEntityService.UpdateAsync(id, model, user);
             return result.ToActionResult();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+            var user = await GetCurrentUserAsync(User);
 
-            var result = await _productRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
+            var result = await _productEntityService.DeleteAsync(id, user);
             return result.ToActionResult();
         }
     }

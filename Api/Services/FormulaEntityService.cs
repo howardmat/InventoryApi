@@ -1,136 +1,193 @@
 ﻿using Api.Authorization;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Models;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class FormulaEntityService
 {
-    public class FormulaEntityService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly ResourceAuthorization<MaterialAuthorizationProvider> _materialAuthorizationProvider;
+    private readonly ResourceAuthorization<CategoryAuthorizationProvider> _categoryAuthorizationProvider;
+
+    public FormulaEntityService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ResourceAuthorization<MaterialAuthorizationProvider> materialAuthorizationProvider,
+        ResourceAuthorization<CategoryAuthorizationProvider> categoryAuthorizationProvider)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;   
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _materialAuthorizationProvider = materialAuthorizationProvider;
+        _categoryAuthorizationProvider = categoryAuthorizationProvider;
+    }
 
-        public FormulaEntityService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+    public async Task<ServiceResult<IEnumerable<FormulaModel>>> ListAsync(int tenantId)
+    {
+        // Fetch data
+        var data = await _unitOfWork.FormulaRepository.ListAsync(tenantId);
+
+        // Add to collection
+        var list = new List<FormulaModel>();
+        foreach (var item in data)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            list.Add(_mapper.Map<FormulaModel>(item));
         }
 
-        public async Task<IEnumerable<FormulaModel>> ListAsync(int tenantId)
+        var result = new ServiceResult<IEnumerable<FormulaModel>>()
         {
-            // Fetch data
-            var data = await _unitOfWork.FormulaRepository.ListAsync(tenantId);
+            Data = list
+        };
 
-            // Add to collection
-            var list = new List<FormulaModel>();
-            foreach (var item in data)
+        return result;
+    }
+
+    public async Task<ServiceResult<FormulaModel>> GetModelOrDefaultAsync(int id, int tenantId)
+    {
+        var result = new ServiceResult<FormulaModel>();
+
+        // Fetch object
+        var formula = await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
+
+        // Set response
+        if (formula == null)
+        {
+            result.SetNotFound($"Unable to locate Formula object ({id})");
+            return result;
+        }
+
+        result.Data = _mapper.Map<FormulaModel>(formula);
+
+        return result;
+    }
+
+    public async Task<ServiceResult<FormulaModel>> CreateAsync(string name, int categoryId, string description, IEnumerable<FormulaIngredientRequest> ingredients, UserProfile user)
+    {
+        var result = new ServiceResult<FormulaModel>();
+
+        if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, categoryId))
+        {
+            result.SetNotFound($"CategoryId [{categoryId}] is invalid");
+            return result;
+        }
+
+        foreach (var ingredient in ingredients)
+        {
+            // Ensure MaterialId belongs to Tenant
+            if (!await _materialAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, ingredient.MaterialId.Value))
             {
-                list.Add(_mapper.Map<FormulaModel>(item));
+                result.SetNotFound($"MaterialId [{ingredient.MaterialId}] is invalid");
+                return result;
             }
-
-            return list;
         }
 
-        public async Task<Formula> GetEntityOrDefaultAsync(int id, int tenantId)
+        var now = DateTime.UtcNow;
+
+        // Build and add the new object
+        var formula = new Formula
         {
-            // Fetch object
-            var entity = await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
+            Name = name,
+            CategoryId = categoryId,
+            Description = description,
+            CreatedUserId = user.Id,
+            LastModifiedUserId = user.Id,
+            TenantId = user.TenantId.Value,
+            CreatedUtc = now,
+            LastModifiedUtc = now
+        };
+        await _unitOfWork.FormulaRepository.AddAsync(formula);
 
-            return entity;
-        }
-
-        public async Task<FormulaModel> GetModelOrDefaultAsync(int id, int tenantId)
+        // Add Ingredients if included
+        foreach (var ingredient in ingredients)
         {
-            FormulaModel model = null;
-
-            // Fetch object
-            var formula = await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
-
-            // Set response
-            if (formula != null)
+            var formulaIngredient = new FormulaIngredient
             {
-                model = _mapper.Map<FormulaModel>(formula);
-            }
-
-            return model;
-        }
-
-        public async Task<FormulaModel> CreateAsync(FormulaRequest model, int modifyingUserId, int tenantId)
-        {
-            FormulaModel newModel = null;
-
-            var now = DateTime.UtcNow;
-
-            // Build and add the new object
-            var formula = new Formula
-            {
-                Name = model.Name,
-                CategoryId = model.CategoryId.Value,
-                Description = model.Description,
-                CreatedUserId = modifyingUserId,
-                LastModifiedUserId = modifyingUserId,
-                TenantId = tenantId,
+                Formula = formula,
+                MaterialId = ingredient.MaterialId.Value,
+                Quantity = ingredient.Quantity.Value,
+                CreatedUserId = user.Id,
+                LastModifiedUserId = user.Id,
                 CreatedUtc = now,
                 LastModifiedUtc = now
             };
-            await _unitOfWork.FormulaRepository.AddAsync(formula);
 
-            // Add Ingredients if included
-            foreach (var ingredient in model.Ingredients)
-            {
-                var formulaIngredient = new FormulaIngredient
-                {
-                    Formula = formula,
-                    MaterialId = ingredient.MaterialId.Value,
-                    Quantity = ingredient.Quantity.Value,
-                    CreatedUserId = modifyingUserId,
-                    LastModifiedUserId = modifyingUserId,
-                    CreatedUtc = now,
-                    LastModifiedUtc = now
-                };
-
-                formula.Ingredients.Add(formulaIngredient);
-            }
-
-            // Set response
-            if (await _unitOfWork.CompleteAsync() > 0)
-            {
-                newModel = await GetModelOrDefaultAsync(formula.Id, tenantId);
-            }
-
-            return newModel;
+            formula.Ingredients.Add(formulaIngredient);
         }
 
-        public async Task<bool> UpdateAsync(Formula formula, FormulaRequest model, int modifyingUserId)
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
         {
-            // Update properties
-            formula.Name = model.Name;
-            formula.CategoryId = model.CategoryId.Value;
-            formula.Description = model.Description;
-            formula.LastModifiedUserId = modifyingUserId;
-            formula.LastModifiedUtc = DateTime.UtcNow;
-
-            // Set response
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            result.SetError("Failed to create Formula");
+            return result;
         }
 
-        public async Task<bool> DeleteAsync(Formula formula, int modifyingUserId)
+        var formulaResult = await GetModelOrDefaultAsync(formula.Id, user.TenantId.Value);
+        result.Data = formulaResult.Data;
+
+        return result;
+    }
+
+    public async Task<ServiceResult> UpdateAsync(int id, string name, int categoryId, string description, UserProfile user)
+    {
+        var result = new ServiceResult();
+
+        if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, categoryId))
         {
-            _unitOfWork.FormulaRepository.Remove(formula);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            result.SetNotFound($"CategoryId [{categoryId}] is invalid");
+            return result;
         }
+
+        // Fetch the existing object
+        var formula = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (formula == null)
+        {
+            result.SetNotFound($"Unable to locate Formula object ({id})");
+            return result;
+        }
+
+        // Update properties
+        formula.Name = name;
+        formula.CategoryId = categoryId;
+        formula.Description = description;
+        formula.LastModifiedUserId = user.Id;
+        formula.LastModifiedUtc = DateTime.UtcNow;
+
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0) result.SetError("Failed to update Formula");
+
+        return result;
+    }
+
+    public async Task<ServiceResult> DeleteAsync(int id, UserProfile user)
+    {
+        var result = new ServiceResult();
+
+        // Fetch the existing object
+        var formula = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (formula == null)
+        {
+            result.SetNotFound($"Unable to locate Formula object ({id})");
+            return result;
+        }
+
+        _unitOfWork.FormulaRepository.Remove(formula);
+
+        if (await _unitOfWork.CompleteAsync() <= 0) result.SetError("Failed to delete Formula");
+
+        return result;
+    }
+
+    private async Task<Formula> GetEntityOrDefaultAsync(int id, int tenantId)
+    {
+        // Fetch object
+        return await _unitOfWork.FormulaRepository.GetAsync(id, tenantId);
     }
 }

@@ -5,26 +5,25 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Authorize]
+[Route("/country")]
+[ApiController]
+public class CountryController : InventoryControllerBase
 {
-    [Authorize]
-    [Route("/country")]
-    [ApiController]
-    public class CountryController : InventoryControllerBase
+    private readonly CountryEntityService _countryEntityService;
+
+    public CountryController(
+        CountryEntityService countryEntityService)
     {
-        private readonly CountryRequestService _countryRequestService;
+        _countryEntityService = countryEntityService;
+    }
 
-        public CountryController(
-            CountryRequestService countryRequestService)
-        {
-            _countryRequestService = countryRequestService;
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
-        {
-            var serviceResponse = await _countryRequestService.ProcessListRequestAsync();
-            return serviceResponse.ToActionResult();
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<CountryModel>>> Get()
+    {
+        var result = await _countryEntityService.ListAsync();
+        return result.ToActionResult();
     }
 }

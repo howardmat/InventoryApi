@@ -1,5 +1,7 @@
-﻿using Api.Models.Dto;
+﻿using Api.Authorization;
+using Api.Models.Dto;
 using Api.Models.RequestModels;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -7,113 +9,160 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class MaterialEntityService
 {
-    public class MaterialEntityService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly ResourceAuthorization<CategoryAuthorizationProvider> _categoryAuthorizationProvider;
+
+    public MaterialEntityService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ResourceAuthorization<CategoryAuthorizationProvider> categoryAuthorizationProvider)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _categoryAuthorizationProvider = categoryAuthorizationProvider;
+    }
 
-        public MaterialEntityService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+    public async Task<ServiceResult<IEnumerable<MaterialModel>>> ListAsync(int tenantId)
+    {
+        var response = new ServiceResult<IEnumerable<MaterialModel>>();
+
+        // Fetch data
+        var data = await _unitOfWork.MaterialRepository.ListAsync(tenantId);
+
+        // Add to collection
+        var list = new List<MaterialModel>();
+        foreach (var item in data)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            list.Add(_mapper.Map<MaterialModel>(item));
         }
 
-        public async Task<IEnumerable<MaterialModel>> ListAsync(int tenantId)
+        response.Data = list;
+
+        return response;
+    }
+
+    public async Task<ServiceResult<MaterialModel>> GetModelOrDefaultAsync(int id, int tenantId)
+    {
+        var response = new ServiceResult<MaterialModel>();
+
+        // Fetch object
+        var material = await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
+
+        // Set response
+        if (material == null)
         {
-            // Fetch data
-            var data = await _unitOfWork.MaterialRepository.ListAsync(tenantId);
-
-            // Add to collection
-            var list = new List<MaterialModel>();
-            foreach (var item in data)
-            {
-                list.Add(_mapper.Map<MaterialModel>(item));
-            }
-
-            return list;
+            response.SetNotFound($"Unable to locate Material object ({id})");
         }
 
-        public async Task<Material> GetEntityOrDefaultAsync(int id, int tenantId)
-        {
-            // Fetch object
-            var entity = await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
+        response.Data = _mapper.Map<MaterialModel>(material);
 
-            return entity;
+        return response;
+    }
+
+    public async Task<ServiceResult<MaterialModel>> CreateAsync(MaterialRequest model, UserProfile user)
+    {
+        var response = new ServiceResult<MaterialModel>();
+
+        if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, model.CategoryId.Value))
+        {
+            response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+            return response;
         }
 
-        public async Task<MaterialModel> GetModelOrDefaultAsync(int id, int tenantId)
+        var now = DateTime.UtcNow;
+
+        // Build and add the new object
+        var material = new Material
         {
-            MaterialModel model = null;
+            Name = model.Name,
+            CategoryId = model.CategoryId.Value,
+            Description = model.Description,
+            UnitOfMeasurementId = model.UnitOfMeasurementId.Value,
+            CreatedUserId = user.Id,
+            LastModifiedUserId = user.Id,
+            TenantId = user.TenantId.Value,
+            CreatedUtc = now,
+            LastModifiedUtc = now
+        };
+        await _unitOfWork.MaterialRepository.AddAsync(material);
 
-            // Fetch object
-            var material = await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
-
-            // Set response
-            if (material != null)
-            {
-                model = _mapper.Map<MaterialModel>(material);
-            }
-
-            return model;
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            response.SetError("An unexpected error occurred while saving the Material object");
         }
 
-        public async Task<MaterialModel> CreateAsync(MaterialRequest model, int modifyingUserId, int tenantId)
+        var modelResult = await GetModelOrDefaultAsync(material.Id, user.TenantId.Value);
+        response.Data = modelResult.Data;
+
+        return response;
+    }
+
+    public async Task<ServiceResult> UpdateAsync(int id, MaterialRequest model, UserProfile user)
+    {
+        var response = new ServiceResult();
+
+        if (!await _categoryAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, model.CategoryId.Value))
         {
-            MaterialModel newModel = null;
-
-            var now = DateTime.UtcNow;
-
-            // Build and add the new object
-            var material = new Material
-            {
-                Name = model.Name,
-                CategoryId = model.CategoryId.Value,
-                Description = model.Description,
-                UnitOfMeasurementId = model.UnitOfMeasurementId.Value,
-                CreatedUserId = modifyingUserId,
-                LastModifiedUserId = modifyingUserId,
-                TenantId = tenantId,
-                CreatedUtc = now,
-                LastModifiedUtc = now
-            };
-            await _unitOfWork.MaterialRepository.AddAsync(material);
-
-            // Set response
-            if (await _unitOfWork.CompleteAsync() > 0)
-            {
-                newModel = await GetModelOrDefaultAsync(material.Id, tenantId);
-            }
-
-            return newModel;
+            response.SetNotFound($"CategoryId [{model.CategoryId}] is invalid");
+            return response;
         }
 
-        public async Task<bool> UpdateAsync(Material material, MaterialRequest model, int modifyingUserId)
+        // Fetch the existing object
+        var material = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (material == null)
         {
-            // Update properties
-            material.Name = model.Name;
-            material.CategoryId = model.CategoryId.Value;
-            material.Description = model.Description;
-            material.UnitOfMeasurementId = model.UnitOfMeasurementId.Value;
-            material.LastModifiedUserId = modifyingUserId;
-            material.LastModifiedUtc = DateTime.UtcNow;
-
-            // Set response
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            response.SetNotFound($"Unable to locate Material object ({id})");
+            return response;
         }
 
-        public async Task<bool> DeleteAsync(Material material, int modifyingUserId)
+        // Update properties
+        material.Name = model.Name;
+        material.CategoryId = model.CategoryId.Value;
+        material.Description = model.Description;
+        material.UnitOfMeasurementId = model.UnitOfMeasurementId.Value;
+        material.LastModifiedUserId = user.Id;
+        material.LastModifiedUtc = DateTime.UtcNow;
+
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
         {
-            _unitOfWork.MaterialRepository.Remove(material);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            response.SetError("An unexpected error occurred while saving the Material object");
         }
+
+        return response;
+    }
+
+    public async Task<ServiceResult> DeleteAsync(int id, UserProfile user)
+    {
+        var response = new ServiceResult();
+
+        // Fetch the existing object
+        var material = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (material == null)
+        {
+            response.SetNotFound($"Unable to locate Material object ({id})");
+            return response;
+        }
+
+        _unitOfWork.MaterialRepository.Remove(material);
+
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            response.SetError("An unexpected error occurred while removing the Material object");
+        }
+
+        return response;
+    }
+
+    private async Task<Material> GetEntityOrDefaultAsync(int id, int tenantId)
+    {
+        // Fetch object
+        return await _unitOfWork.MaterialRepository.GetAsync(id, tenantId);
     }
 }

@@ -23,15 +23,6 @@ namespace Api.Services
             return principal.Claims.Where(c => c.Type.Equals(CustomClaimTypes.UserId, StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault();
         }
 
-        public int GetTenantIdBasedOnClaims(ClaimsPrincipal principal)
-        {
-            var tenantId = -1;
-
-            int.TryParse(principal.Claims.Where(c => c.Type.Equals(CustomClaimTypes.TenantId, StringComparison.InvariantCultureIgnoreCase)).Select(c => c.Value).FirstOrDefault(), out tenantId);
-
-            return tenantId;
-        }
-
         public async Task<UserProfile> GetUserBasedOnClaimsAsync(ClaimsPrincipal principal)
         {
             var authProviderUserId = GetAuthenticationProviderUserIdOrDefault(principal);

@@ -1,5 +1,7 @@
-﻿using Api.Models.Dto;
+﻿using Api.Authorization;
+using Api.Models.Dto;
 using Api.Models.RequestModels;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Models;
@@ -7,97 +9,132 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class ProductInventoryTransactionService
 {
-    public class ProductInventoryTransactionService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+    private readonly ResourceAuthorization<ProductAuthorizationProvider> _productAuthorizationProvider;
+
+    public ProductInventoryTransactionService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ResourceAuthorization<ProductAuthorizationProvider> productAuthorizationProvider)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+        _productAuthorizationProvider = productAuthorizationProvider;
+    }
 
-        public ProductInventoryTransactionService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+    public async Task<ServiceResult<IEnumerable<ProductInventoryTransactionModel>>> ListAsync(int productId, int tenantId)
+    {
+        var response = new ServiceResult<IEnumerable<ProductInventoryTransactionModel>>();
+
+        if (!await _productAuthorizationProvider.TenantHasResourceAccessAsync(tenantId, productId))
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            response.SetNotFound($"ProductId [{productId}] is invalid");
+            return response;
         }
 
-        public async Task<IEnumerable<ProductInventoryTransactionModel>> ListAsync(int productId, int tenantId)
+        // Fetch data
+        var data = await _unitOfWork.ProductInventoryTransactionRepository.ListAsync(productId, tenantId);
+
+        // Add to collection
+        var list = new List<ProductInventoryTransactionModel>();
+        foreach (var item in data)
         {
-            // Fetch data
-            var data = await _unitOfWork.ProductInventoryTransactionRepository.ListAsync(productId, tenantId);
-
-            // Add to collection
-            var list = new List<ProductInventoryTransactionModel>();
-            foreach (var item in data)
-            {
-                list.Add(_mapper.Map<ProductInventoryTransactionModel>(item));
-            }
-
-            return list;
+            list.Add(_mapper.Map<ProductInventoryTransactionModel>(item));
         }
 
-        public async Task<ProductInventoryTransaction> GetEntityOrDefaultAsync(int id, int tenantId)
-        {
-            // Fetch object
-            var entity = await _unitOfWork.ProductInventoryTransactionRepository.GetAsync(id, tenantId);
+        response.Data = list;
 
-            return entity;
+        return response;
+    }
+
+    public async Task<ServiceResult<ProductInventoryTransactionModel>> GetModelOrDefaultAsync(int id, int tenantId)
+    {
+        var response = new ServiceResult<ProductInventoryTransactionModel>();
+
+        // Fetch object
+        var productInventoryTransaction = await GetEntityOrDefaultAsync(id, tenantId);
+
+        // Set response
+        if (productInventoryTransaction == null)
+        {
+            response.SetNotFound($"Unable to locate Product Inventory record ({id})");
+            return response;
         }
 
-        public async Task<ProductInventoryTransactionModel> GetModelOrDefaultAsync(int id, int tenantId)
+        response.Data = _mapper.Map<ProductInventoryTransactionModel>(productInventoryTransaction);
+
+        return response;
+    }
+
+    public async Task<ServiceResult<ProductInventoryTransactionModel>> CreateAsync(ProductInventoryTransactionRequest model, UserProfile user)
+    {
+        var response = new ServiceResult<ProductInventoryTransactionModel>();
+
+        if (!await _productAuthorizationProvider.TenantHasResourceAccessAsync(user.TenantId.Value, model.ProductId.Value))
         {
-            ProductInventoryTransactionModel model = null;
-
-            // Fetch object
-            var productInventoryTransaction = await GetEntityOrDefaultAsync(id, tenantId);
-
-            // Set response
-            if (productInventoryTransaction != null)
-            {
-                model = _mapper.Map<ProductInventoryTransactionModel>(productInventoryTransaction);
-            }
-
-            return model;
+            response.SetNotFound($"ProductId [{model.ProductId}] is invalid");
+            return response;
         }
 
-        public async Task<ProductInventoryTransactionModel> CreateAsync(ProductInventoryTransactionRequest model, int modifyingUserId, int tenantId)
+        var now = DateTime.UtcNow;
+
+        // Build and add the new object
+        var transaction = new ProductInventoryTransaction
         {
-            ProductInventoryTransactionModel newModel = null;
+            ProductId = model.ProductId.Value,
+            Quantity = model.Quantity,
+            OrderDetailId = model.OrderDetailId,
+            Description = model.Description,
+            CreatedUserId = user.Id,
+            LastModifiedUserId = user.Id,
+            TenantId = user.TenantId.Value,
+            CreatedUtc = now,
+            LastModifiedUtc = now
+        };
+        await _unitOfWork.ProductInventoryTransactionRepository.AddAsync(transaction);
 
-            var now = DateTime.UtcNow;
-
-            // Build and add the new object
-            var transaction = new ProductInventoryTransaction
-            {
-                ProductId = model.ProductId.Value,
-                Quantity = model.Quantity,
-                OrderDetailId = model.OrderDetailId,
-                Description = model.Description,
-                CreatedUserId = modifyingUserId,
-                LastModifiedUserId = modifyingUserId,
-                TenantId = tenantId,
-                CreatedUtc = now,
-                LastModifiedUtc = now
-            };
-            await _unitOfWork.ProductInventoryTransactionRepository.AddAsync(transaction);
-
-            // Set response
-            if (await _unitOfWork.CompleteAsync() > 0)
-            {
-                newModel = await GetModelOrDefaultAsync(transaction.Id, tenantId);
-            }
-
-            return newModel;
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            response.SetError("An unexpected error occurred while saving the Product Inventory record");
+            return response;
         }
 
-        public async Task<bool> DeleteAsync(ProductInventoryTransaction productTransaction, int modifyingUserId)
+        var modelResult = await GetModelOrDefaultAsync(transaction.Id, user.TenantId.Value);
+        response.Data = modelResult.Data;
+
+        return response;
+    }
+
+    public async Task<ServiceResult> DeleteAsync(int id, UserProfile user)
+    {
+        var response = new ServiceResult();
+
+        var entity = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (entity == null)
         {
-            _unitOfWork.ProductInventoryTransactionRepository.Remove(productTransaction);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            response.SetNotFound($"Unable to locate Product object ({id})");
+            return response;
         }
+
+        _unitOfWork.ProductInventoryTransactionRepository.Remove(entity);
+
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            response.SetError("An unexpected error occurred while removing the Product Inventory record");
+        }
+
+        return response;
+    }
+
+    private async Task<ProductInventoryTransaction> GetEntityOrDefaultAsync(int id, int tenantId)
+    {
+        // Fetch object
+        return await _unitOfWork.ProductInventoryTransactionRepository.GetAsync(id, tenantId);
     }
 }

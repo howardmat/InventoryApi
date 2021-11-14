@@ -1,19 +1,18 @@
-﻿using Api.Handlers;
+﻿using Api.Models.Results;
 using System.Threading.Tasks;
 
-namespace Api.Validation.Validators
+namespace Api.Validation.Validators;
+
+public abstract class InventoryValidatorAsyncBase<T> : IValidatorAsync<T> 
 {
-    public abstract class InventoryValidatorAsyncBase<T> : IValidatorAsync<T> 
+    public ServiceResult ServiceResponse => _serviceResponse;
+
+    private ServiceResult _serviceResponse;
+
+    public InventoryValidatorAsyncBase()
     {
-        public ResponseHandler ServiceResponse => _serviceResponse;
-
-        private ResponseHandler _serviceResponse;
-
-        public InventoryValidatorAsyncBase()
-        {
-            _serviceResponse = new ResponseHandler();
-        }
-
-        public abstract Task<bool> IsValidAsync(T item);
+        _serviceResponse = new ServiceResult();
     }
+
+    public abstract Task<bool> IsValidAsync(T item);
 }

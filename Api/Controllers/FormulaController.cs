@@ -7,78 +7,80 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Authorize]
+[Route("/formula")]
+[ApiController]
+public class FormulaController : InventoryControllerBase
 {
-    [Authorize]
-    [Route("/formula")]
-    [ApiController]
-    public class FormulaController : InventoryControllerBase
+    private readonly FormulaEntityService _formulaEntityService;
+    private readonly FormulaRequestValidator _formulaRequestValidator;
+
+    public FormulaController(
+        FormulaEntityService formulaEntityService,
+        FormulaRequestValidator formulaRequestValidator,
+        AuthenticationDetailService authDetailService) : base(authDetailService)
     {
-        private readonly FormulaRequestService _formulaRequestService;
-        private readonly FormulaRequestValidator _formulaRequestValidator;
+        _formulaEntityService = formulaEntityService;
+        _formulaRequestValidator = formulaRequestValidator;
+    }
 
-        public FormulaController(
-            FormulaRequestService formulaRequestService,
-            FormulaRequestValidator formulaRequestValidator,
-            AuthenticationDetailService authDetailService) : base(authDetailService)
-        {
-            _formulaRequestService = formulaRequestService;
-            _formulaRequestValidator = formulaRequestValidator;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<FormulaModel>>> Get()
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<FormulaModel>>> Get()
-        {
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _formulaEntityService.ListAsync(user.TenantId.Value);
+        return result.ToActionResult();
+    }
 
-            var result = await _formulaRequestService.ProcessListRequestAsync(tenantId);
-            return result.ToActionResult();
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<FormulaModel>> Get(int id)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FormulaModel>> Get(int id)
-        {
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _formulaEntityService.GetModelOrDefaultAsync(id, user.TenantId.Value);
+        return result.ToActionResult();
+    }
 
-            var result = await _formulaRequestService.ProcessGetRequestAsync(id, tenantId);
-            return result.ToActionResult();
-        }
+    [HttpPost]
+    public async Task<ActionResult<FormulaModel>> Post(FormulaRequest model)
+    {
+        if (!await _formulaRequestValidator.IsValidAsync(model))
+            return _formulaRequestValidator.ServiceResponse.ToActionResult();
 
-        [HttpPost]
-        public async Task<ActionResult<FormulaModel>> Post(FormulaRequest model)
-        {
-            if (!await _formulaRequestValidator.IsValidAsync(model))
-                return _formulaRequestValidator.ServiceResponse.ToActionResult();
+        var user = await GetCurrentUserAsync(User);
 
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _formulaEntityService.CreateAsync(
+            model.Name,
+            model.CategoryId.Value,
+            model.Description,
+            model.Ingredients,
+            user);
 
-            var result = await _formulaRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
-            return result.ToActionResult(
-                Url.Action("Get", "Formula", new { id = result.Data?.Id }));
-        }
+        return result.ToActionResult(
+            Url.Action("Get", "Formula", new { id = result.Data?.Id }));
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, FormulaRequest model)
-        {
-            if (!await _formulaRequestValidator.IsValidAsync(model))
-                return _formulaRequestValidator.ServiceResponse.ToActionResult();
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, FormulaRequest model)
+    {
+        if (!await _formulaRequestValidator.IsValidAsync(model))
+            return _formulaRequestValidator.ServiceResponse.ToActionResult();
 
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+        var user = await GetCurrentUserAsync(User);
 
-            var result = await _formulaRequestService.ProcessUpdateRequestAsync(id, model, userId, tenantId);
-            return result.ToActionResult();
-        }
+        var result = await _formulaEntityService.UpdateAsync(id, model.Name, model.CategoryId.Value, model.Description, user);
+        return result.ToActionResult();
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-            var result = await _formulaRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
-            return result.ToActionResult();
-        }
+        var result = await _formulaEntityService.DeleteAsync(id, user);
+        return result.ToActionResult();
     }
 }

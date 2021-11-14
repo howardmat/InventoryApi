@@ -37,40 +37,17 @@ namespace Api.Extensions
         public static void AddInventoryApplicationServices(this IServiceCollection services)
         {
             services.AddTransient<CategoryEntityService>();
-            services.AddTransient<CategoryRequestService>();
-
             services.AddTransient<CountryEntityService>();
-            services.AddTransient<CountryRequestService>();
-
             services.AddTransient<FormulaEntityService>();
-            services.AddTransient<FormulaRequestService>();
             services.AddTransient<FormulaIngredientEntityService>();
-            services.AddTransient<FormulaIngredientRequestService>();
-
             services.AddTransient<MaterialEntityService>();
-            services.AddTransient<MaterialRequestService>();
-            services.AddTransient<MaterialInventoryRequestService>();
             services.AddTransient<MaterialInventoryTransactionService>();
-
             services.AddTransient<ProductEntityService>();
-            services.AddTransient<ProductRequestService>();
-            services.AddTransient<ProductInventoryRequestService>();
             services.AddTransient<ProductInventoryTransactionService>();
-
             services.AddTransient<ProvinceEntityService>();
-            services.AddTransient<ProvinceRequestService>();
-
-            services.AddTransient<RegisterUserRequestService>();
-            services.AddTransient<RegisterCompanyRequestService>();
-
             services.AddTransient<TenantEntityService>();
-            services.AddTransient<TenantRequestService>();
-
             services.AddTransient<UnitOfMeasurementEntityService>();
-            services.AddTransient<UnitOfMeasurementRequestService>();
-
             services.AddTransient<UserEntityService>();
-            services.AddTransient<UserRequestService>();
         }
 
         public static void AddInventoryValidators(this IServiceCollection services)

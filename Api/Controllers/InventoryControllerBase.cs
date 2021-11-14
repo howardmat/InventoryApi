@@ -1,39 +1,28 @@
 ﻿using Api.Services;
+using Data.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+public class InventoryControllerBase : ControllerBase
 {
-    public class InventoryControllerBase : ControllerBase
+    private readonly AuthenticationDetailService _authenticationDetailService;
+
+    public InventoryControllerBase() { }
+
+    public InventoryControllerBase(
+        AuthenticationDetailService authenticationDetailService)
     {
-        private readonly AuthenticationDetailService _authenticationDetailService;
+        _authenticationDetailService = authenticationDetailService;
+    }
 
-        public InventoryControllerBase() { }
+    protected async Task<UserProfile> GetCurrentUserAsync(ClaimsPrincipal principal)
+    {
+        if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentUserAsync to be called in child class.");
 
-        public InventoryControllerBase(
-            AuthenticationDetailService authenticationDetailService)
-        {
-            _authenticationDetailService = authenticationDetailService;
-        }
-
-        protected async Task<int> GetCurrentUserIdAsync(ClaimsPrincipal principal)
-        {
-            if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentUserIdAsync to be called in child class.");
-
-            var user = await _authenticationDetailService.GetUserBasedOnClaimsAsync(principal);
-
-            return user.Id;
-        }
-
-        protected int GetCurrentTenantId(ClaimsPrincipal principal)
-        {
-            if (_authenticationDetailService == null) throw new Exception("AuthenticationDetailService is required in base constructor for GetCurrentTenantIdAsync to be called in child class.");
-
-            var tenantId = _authenticationDetailService.GetTenantIdBasedOnClaims(principal);
-
-            return tenantId;
-        }
+        return await _authenticationDetailService.GetUserBasedOnClaimsAsync(principal);
     }
 }

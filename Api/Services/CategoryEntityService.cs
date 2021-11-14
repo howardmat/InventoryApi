@@ -1,4 +1,5 @@
 ﻿using Api.Models.Dto;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Enums;
@@ -8,108 +9,132 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class CategoryEntityService
 {
-    public class CategoryEntityService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public CategoryEntityService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
+        ILogger<CategoryEntityService> logger)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
 
-        public CategoryEntityService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper,
-            ILogger<CategoryEntityService> logger)
+    public async Task<ServiceResult<IEnumerable<CategoryModel>>> ListAsync(CategoryType categoryType, int tenantId)
+    {
+        var result = new ServiceResult<IEnumerable<CategoryModel>>();
+
+        // Fetch data
+        var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType, tenantId);
+
+        // Add to collection
+        var list = new List<CategoryModel>();
+        foreach (var item in data)
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            list.Add(_mapper.Map<CategoryModel>(item));
         }
 
-        public async Task<IEnumerable<CategoryModel>> ListAsync(CategoryType categoryType, int tenantId)
+        result.Data = list;
+
+        return result;
+    }
+
+    public async Task<ServiceResult<CategoryModel>> GetModelOrDefaultAsync(int id, int tenantId)
+    {
+        var result = new ServiceResult<CategoryModel>();
+
+        // Fetch object
+        var category = await GetEntityOrDefaultAsync(id, tenantId);
+        if (category == null)
         {
-            // Fetch data
-            var data = await _unitOfWork.CategoryRepository.ListAsync(categoryType, tenantId);
-
-            // Add to collection
-            var list = new List<CategoryModel>();
-            foreach (var item in data)
-            {
-                list.Add(_mapper.Map<CategoryModel>(item));
-            }
-
-            return list;
+            result.SetNotFound($"Unable to locate Category object ({id})");
+            return result;
         }
 
-        public async Task<Category> GetEntityOrDefaultAsync(int id, int tenantId)
-        {
-            // Fetch object
-            var entity = await _unitOfWork.CategoryRepository.GetAsync(id, tenantId);
+        result.Data = _mapper.Map<CategoryModel>(category);
 
-            return entity;
+        return result;
+    }
+
+    public async Task<ServiceResult<CategoryModel>> CreateAsync(string name, CategoryType categoryType, UserProfile user)
+    {
+        var result = new ServiceResult<CategoryModel>();
+
+        var now = DateTime.UtcNow;
+
+        // Build and add the new object
+        var category = new Category
+        {
+            Name = name,
+            Type = categoryType,
+            TenantId = user.TenantId.Value,
+            CreatedUserId = user.Id,
+            CreatedUtc = now,
+            LastModifiedUserId = user.Id,
+            LastModifiedUtc = now
+        };
+        await _unitOfWork.CategoryRepository.AddAsync(category);
+
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            result.SetError("Failed to create Category");
+            return result;
         }
 
-        public async Task<CategoryModel> GetModelOrDefaultAsync(CategoryType categoryType, int id, int tenantId)
+        result.Data = _mapper.Map<CategoryModel>(category);
+
+        return result;
+    }
+
+    public async Task<ServiceResult> UpdateAsync(int id, string name, CategoryType type, UserProfile user)
+    {
+        var result = new ServiceResult();
+
+        // Fetch the existing object
+        var entity = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (entity == null)
         {
-            CategoryModel model = null;
-
-            // Fetch object
-            var category = await GetEntityOrDefaultAsync(id, tenantId);
-            if (category != null && category.Type == categoryType)
-            {
-                model = _mapper.Map<CategoryModel>(category);
-            }
-
-            return model;
+            result.SetNotFound($"Unable to locate Category object ({id})");
+            return result;
         }
 
-        public async Task<CategoryModel> CreateAsync(string name, CategoryType categoryType, int modifyingUserId, int tenantId)
+        // Update entity
+        entity.Name = name;
+        entity.Type = type;
+        entity.LastModifiedUserId = user.Id;
+        entity.LastModifiedUtc = DateTime.UtcNow;
+
+        if (await _unitOfWork.CompleteAsync() <= 0) result.SetError("Failed to update Category");
+
+        return result;
+    }
+
+    public async Task<ServiceResult> DeleteAsync(int id, UserProfile user)
+    {
+        var result = new ServiceResult();
+
+        var entity = await GetEntityOrDefaultAsync(id, user.TenantId.Value);
+        if (entity == null)
         {
-            CategoryModel model = null;
-
-            var now = DateTime.UtcNow;
-
-            // Build and add the new object
-            var category = new Category
-            {
-                Name = name,
-                Type = categoryType,
-                TenantId = tenantId,
-                CreatedUserId = modifyingUserId,
-                CreatedUtc = now,
-                LastModifiedUserId = modifyingUserId,
-                LastModifiedUtc = now
-            };
-            await _unitOfWork.CategoryRepository.AddAsync(category);
-
-            // Set response
-            if (await _unitOfWork.CompleteAsync() > 0)
-            {
-                model = _mapper.Map<CategoryModel>(category);
-            }
-
-            return model;
+            result.SetNotFound();
+            return result;
         }
 
-        public async Task<bool> UpdateAsync(Category category, string name, int modifyingUserId)
-        {
-            var now = DateTime.UtcNow;
+        _unitOfWork.CategoryRepository.Remove(entity);
 
-            // Update entity
-            category.Name = name;
-            category.LastModifiedUserId = modifyingUserId;
-            category.LastModifiedUtc = now;
+        if (await _unitOfWork.CompleteAsync() <= 0) result.SetError("Failed to delete Category");
 
-            var success = await _unitOfWork.CompleteAsync() > 0;
+        return result;
+    }
 
-            return success;
-        }
-
-        public async Task<bool> DeleteAsync(Category category, int modifyingUserId)
-        {
-            _unitOfWork.CategoryRepository.Remove(category);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
-        }
+    private async Task<Category> GetEntityOrDefaultAsync(int id, int tenantId)
+    {
+        return await _unitOfWork.CategoryRepository.GetAsync(id, tenantId);
     }
 }

@@ -1,11 +1,11 @@
 ﻿using Api.Extensions;
 using Api.Models.Dto;
 using Api.Models.RequestModels;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Models;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Api.Services
@@ -23,46 +23,11 @@ namespace Api.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TenantModel>> ListAsync()
+        public async Task<ServiceResult<TenantModel>> RegisterNewAsync(RegisterCompanyRequest model, UserProfile user)
         {
-            // Fetch data
-            var data = await _unitOfWork.TenantRepository.ListAsync();
+            var response = new ServiceResult<TenantModel>();
 
-            // Add to collection
-            var list = new List<TenantModel>();
-            foreach (var item in data)
-            {
-                list.Add(_mapper.Map<TenantModel>(item));
-            }
-
-            return list;
-        }
-
-        public async Task<Tenant> GetEntityOrDefaultAsync(int id)
-        {
-            // Fetch object
-            var entity = await _unitOfWork.TenantRepository.GetAsync(id);
-
-            return entity;
-        }
-
-        public async Task<TenantModel> GetModelOrDefaultAsync(int id)
-        {
-            TenantModel model = null;
-
-            // Fetch object
-            var tenant = await GetEntityOrDefaultAsync(id);
-            if (tenant != null)
-            {
-                model = _mapper.Map<TenantModel>(tenant);
-            }
-
-            return model;
-        }
-
-        public async Task<TenantModel> CreateAsync(TenantRequest model, int modifyingUserId, bool assignCreatorAsOwner = false)
-        {
-            TenantModel newModel = null;
+            var assignCreatorAsOwner = true;
 
             var now = DateTime.UtcNow;
 
@@ -72,15 +37,15 @@ namespace Api.Services
                 model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
                 model.PrimaryAddress.CountryIsoCode,
                 model.PrimaryAddress.ProvinceIsoCode,
-                modifyingUserId);
-            
+                user.Id);
+
             var tenant = new Tenant
             {
                 CompanyName = model.CompanyName,
-                OwnerUserId = modifyingUserId,
+                OwnerUserId = user.Id,
                 PrimaryAddress = tenantAddress,
-                CreatedUserId = modifyingUserId,
-                LastModifiedUserId = modifyingUserId,
+                CreatedUserId = user.Id,
+                LastModifiedUserId = user.Id,
                 CreatedUtc = now,
                 LastModifiedUtc = now
             };
@@ -88,63 +53,22 @@ namespace Api.Services
 
             if (assignCreatorAsOwner)
             {
-                var ownerUser = await _unitOfWork.UserRepository.GetAsync(modifyingUserId);
+                var ownerUser = await _unitOfWork.UserRepository.GetAsync(user.Id);
                 ownerUser.Tenant = tenant;
             }
 
             // Save data
-            if (await _unitOfWork.CompleteAsync() > 0)
+            if (await _unitOfWork.CompleteAsync() <= 0)
             {
-                tenant = await _unitOfWork.TenantRepository.GetAsync(tenant.Id);
-
-                newModel = _mapper.Map<TenantModel>(tenant);
+                response.SetError("An unexpected error occurred while registering the Company");
+                return response;
             }
 
-            return newModel;
-        }
+            tenant = await _unitOfWork.TenantRepository.GetAsync(tenant.Id);
 
-        public async Task<bool> UpdateAsync(Tenant tenant, TenantRequest model, int modifyingUserId)
-        {
-            var now = DateTime.UtcNow;
+            response.Data = _mapper.Map<TenantModel>(tenant);
 
-            // Update properties
-            tenant.CompanyName = model.CompanyName;
-            tenant.LastModifiedUserId = modifyingUserId;
-            tenant.LastModifiedUtc = now;
-
-            if (tenant.PrimaryAddress == null)
-            {
-                tenant.PrimaryAddress = new Address(
-                    model.PrimaryAddress.StreetAddress,
-                    model.PrimaryAddress.City,
-                    model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
-                    model.PrimaryAddress.CountryIsoCode,
-                    model.PrimaryAddress.ProvinceIsoCode,
-                    modifyingUserId);
-            }
-            else
-            {
-                tenant.PrimaryAddress.Update(
-                    model.PrimaryAddress.StreetAddress, 
-                    model.PrimaryAddress.City,
-                    model.PrimaryAddress.PostalCode.StripPostalCodeFormatting(),
-                    model.PrimaryAddress.CountryIsoCode,
-                    model.PrimaryAddress.ProvinceIsoCode,
-                    modifyingUserId);
-            }            
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
-        }
-
-        public async Task<bool> DeleteAsync(Tenant tenant, int modifyingUserId)
-        {
-            _unitOfWork.TenantRepository.Remove(tenant);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
+            return response;
         }
     }
 }

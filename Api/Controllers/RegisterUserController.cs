@@ -5,32 +5,31 @@ using Api.Validation.Validators;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Route("/register/userprofile")]
+[ApiController]
+public class RegisterUserController : InventoryControllerBase
 {
-    [Route("/register/userprofile")]
-    [ApiController]
-    public class RegisterUserController : InventoryControllerBase
+    private readonly RegisterUserRequestValidator _registerPostValidator;
+    private readonly UserEntityService _userEntityService;
+
+    public RegisterUserController(
+        UserEntityService userEntityService,
+        RegisterUserRequestValidator registerPostValidator)
     {
-        private readonly RegisterUserRequestValidator _registerPostValidator;
-        private readonly RegisterUserRequestService _registerRequestService;
+        _userEntityService = userEntityService;
+        _registerPostValidator = registerPostValidator;
+    }
 
-        public RegisterUserController(
-            RegisterUserRequestService registerRequestService,
-            RegisterUserRequestValidator registerPostValidator)
-        {
-            _registerRequestService = registerRequestService;
-            _registerPostValidator = registerPostValidator;
-        }
+    [HttpPost]
+    public async Task<ActionResult<UserModel>> Post(RegisterUserRequest model)
+    {
+        if (!await _registerPostValidator.IsValidAsync(model))
+            return _registerPostValidator.ServiceResponse.ToActionResult();
 
-        [HttpPost]
-        public async Task<ActionResult<UserModel>> Post(RegisterUserRequest model)
-        {
-            if (!await _registerPostValidator.IsValidAsync(model))
-                return _registerPostValidator.ServiceResponse.ToActionResult();
-
-            var result = await _registerRequestService.ProcessRegisterRequestAsync(model);
-            return result.ToActionResult(
-                Url.Action("Get", "User", new { id = result.Data?.Id }));
-        }
+        var result = await _userEntityService.RegisterNewAsync(model);
+        return result.ToActionResult(
+            Url.Action("Get", "User", new { id = result.Data?.Id }));
     }
 }

@@ -5,33 +5,32 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Authorize]
+[Route("/unitofmeasurement")]
+[ApiController]
+public class UnitOfMeasurementController : InventoryControllerBase
 {
-    [Authorize]
-    [Route("/unitofmeasurement")]
-    [ApiController]
-    public class UnitOfMeasurementController : InventoryControllerBase
+    private readonly UnitOfMeasurementEntityService _unitOfMeasurementService;
+
+    public UnitOfMeasurementController(
+        UnitOfMeasurementEntityService unitOfMeasurementService)
     {
-        private readonly UnitOfMeasurementRequestService _unitOfMeasurementService;
+        _unitOfMeasurementService = unitOfMeasurementService;
+    }
 
-        public UnitOfMeasurementController(
-            UnitOfMeasurementRequestService unitOfMeasurementService)
-        {
-            _unitOfMeasurementService = unitOfMeasurementService;
-        }
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
+    {
+        var result = await _unitOfMeasurementService.ListAsync();
+        return result.ToActionResult();
+    }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<UnitOfMeasurementModel>>> Get()
-        {
-            var result = await _unitOfMeasurementService.ProcessListRequestAsync();
-            return result.ToActionResult();
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
-        {
-            var result = await _unitOfMeasurementService.ProcessGetRequestAsync(id);
-            return result.ToActionResult();
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<UnitOfMeasurementModel>> Get(int id)
+    {
+        var result = await _unitOfMeasurementService.GetModelOrDefaultAsync(id);
+        return result.ToActionResult();
     }
 }

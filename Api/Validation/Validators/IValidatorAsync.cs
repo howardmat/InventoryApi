@@ -1,11 +1,10 @@
-﻿using Api.Handlers;
+﻿using Api.Models.Results;
 using System.Threading.Tasks;
 
-namespace Api.Validation.Validators
+namespace Api.Validation.Validators;
+
+public interface IValidatorAsync<T>
 {
-    public interface IValidatorAsync<T>
-    {
-        ResponseHandler ServiceResponse { get; }
-        Task<bool> IsValidAsync(T item);
-    }
+    ServiceResult ServiceResponse { get; }
+    Task<bool> IsValidAsync(T item);
 }

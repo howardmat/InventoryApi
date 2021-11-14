@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[ApiExplorerSettings(IgnoreApi = true)]
+[ApiController]
+public class ErrorController : InventoryControllerBase
 {
-    [ApiExplorerSettings(IgnoreApi = true)]
-    [ApiController]
-    public class ErrorController : InventoryControllerBase
-    {
-        [Route("/error")]
-        public IActionResult Error() => Problem();
-    }
+    [Route("/error")]
+    public IActionResult Error() => Problem();
 }

@@ -1,115 +1,54 @@
 ﻿using Api.Models.Dto;
+using Api.Models.RequestModels;
+using Api.Models.Results;
 using AutoMapper;
 using Data;
 using Data.Models;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class UserEntityService
 {
-    public class UserEntityService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
+
+    public UserEntityService(
+        IUnitOfWork unitOfWork,
+        IMapper mapper)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
+        _unitOfWork = unitOfWork;
+        _mapper = mapper;
+    }
 
-        public UserEntityService(
-            IUnitOfWork unitOfWork,
-            IMapper mapper)
+    public async Task<ServiceResult<UserModel>> RegisterNewAsync(RegisterUserRequest model)
+    {
+        var response = new ServiceResult<UserModel>();
+
+        var now = DateTime.UtcNow;
+
+        // Build and add the new object
+        var user = new UserProfile
         {
-            _unitOfWork = unitOfWork;
-            _mapper = mapper;
+            LocalId = model.LocalId,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            Email = model.Email,
+            CreatedUtc = now,
+            LastModifiedUtc = now
+        };
+        await _unitOfWork.UserRepository.AddAsync(user);
+
+        // Set response
+        if (await _unitOfWork.CompleteAsync() <= 0)
+        {
+            response.SetError("An unexpected error occurred while saving the User object");
+            return response;
         }
 
-        public async Task<IEnumerable<UserModel>> ListAsync()
-        {
-            // Fetch data
-            var data = await _unitOfWork.UserRepository.ListAsync();
+        response.Data = _mapper.Map<UserModel>(user);
 
-            // Add to collection
-            var list = new List<UserModel>();
-            foreach (var item in data)
-            {
-                list.Add(_mapper.Map<UserModel>(item));
-            }
-
-            return list;
-        }
-
-        public async Task<UserProfile> GetEntityOrDefaultAsync(int id)
-        {
-            // Fetch object
-            var entity = await _unitOfWork.UserRepository.GetAsync(id);
-
-            return entity;
-        }
-
-        public async Task<UserModel> GetModelOrDefaultAsync(int id)
-        {
-            UserModel model = null;
-
-            // Fetch object
-            var user = await GetEntityOrDefaultAsync(id);
-            if (user != null)
-            {
-                model = _mapper.Map<UserModel>(user);
-            }
-
-            return model;
-        }
-
-        public async Task<UserModel> CreateAsync(string localId, string email, string firstName, string lastName, int? modifyingUserId = null)
-        {
-            UserModel model = null;
-
-            var now = DateTime.UtcNow;
-
-            // Build and add the new object
-            var user = new UserProfile
-            {
-                LocalId = localId,
-                FirstName = firstName,
-                LastName = lastName,
-                Email = email,
-                CreatedUserId = modifyingUserId,
-                CreatedUtc = now,
-                LastModifiedUserId = modifyingUserId,
-                LastModifiedUtc = now
-            };
-            await _unitOfWork.UserRepository.AddAsync(user);
-
-            // Set response
-            if (await _unitOfWork.CompleteAsync() > 0)
-            {
-                model = _mapper.Map<UserModel>(user);
-            }
-
-            return model;
-        }
-
-        public async Task<bool> UpdateAsync(UserProfile user, UserModel userModel, int modifyingUserId)
-        {
-            var now = DateTime.UtcNow;
-
-            // Update entity
-            user.Email = userModel.Email;
-            user.FirstName = userModel.FirstName;
-            user.LastName = userModel.LastName;
-            user.LastModifiedUserId = modifyingUserId;
-            user.LastModifiedUtc = now;
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
-        }
-
-        public async Task<bool> DeleteAsync(UserProfile user, int modifyingUserId)
-        {
-            _unitOfWork.UserRepository.Remove(user);
-
-            var success = await _unitOfWork.CompleteAsync() > 0;
-
-            return success;
-        }
+        return response;
     }
 }

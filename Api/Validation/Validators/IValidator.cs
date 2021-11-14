@@ -1,10 +1,9 @@
-﻿using Api.Handlers;
+﻿using Api.Models.Results;
 
-namespace Api.Validation.Validators
+namespace Api.Validation.Validators;
+
+public interface IValidator<T> where T : class, new()
 {
-    public interface IValidator<T> where T : class, new()
-    {
-        ResponseHandler ServiceResponse { get; }
-        bool IsValid(T item);
-    }
+    ServiceResult ServiceResponse { get; }
+    bool IsValid(T item);
 }

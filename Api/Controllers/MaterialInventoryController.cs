@@ -6,60 +6,57 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Api.Models.RequestModels;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Authorize]
+[Route("/material/inventory")]
+[ApiController]
+public class MaterialInventoryController : InventoryControllerBase
 {
-    [Authorize]
-    [Route("/material/inventory")]
-    [ApiController]
-    public class MaterialInventoryController : InventoryControllerBase
+    private readonly MaterialInventoryTransactionService _materialInventoryService;
+
+    public MaterialInventoryController(
+        MaterialInventoryTransactionService materialInventoryService,
+        AuthenticationDetailService authDetailService) : base(authDetailService)
     {
-        private readonly MaterialInventoryRequestService _materialInventoryRequestService;
+        _materialInventoryService = materialInventoryService;
+    }
 
-        public MaterialInventoryController(
-            MaterialInventoryRequestService materialInventoryRequestService,
-            AuthenticationDetailService authDetailService) : base(authDetailService)
-        {
-            _materialInventoryRequestService = materialInventoryRequestService;
-        }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<MaterialInventoryTransactionModel>> Get(int id)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MaterialInventoryTransactionModel>> Get(int id)
-        {
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _materialInventoryService.GetModelOrDefaultAsync(id, user.TenantId.Value);
+        return result.ToActionResult();
+    }
 
-            var result = await _materialInventoryRequestService.ProcessGetRequestAsync(id, tenantId);
-            return result.ToActionResult();
-        }
+    [HttpGet]
+    [Route("/material/{materialId}/inventory")]
+    public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpGet]
-        [Route("/material/{materialId}/inventory")]
-        public async Task<ActionResult<IEnumerable<MaterialInventoryTransactionModel>>> GetByMaterialId(int materialId)
-        {
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _materialInventoryService.ListAsync(materialId, user.TenantId.Value);
+        return result.ToActionResult();
+    }
 
-            var result = await _materialInventoryRequestService.ProcessListRequestAsync(materialId, tenantId);
-            return result.ToActionResult();
-        }
+    [HttpPost]
+    public async Task<ActionResult<MaterialInventoryTransactionModel>> Post(MaterialInventoryTransactionRequest model)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpPost]
-        public async Task<ActionResult<MaterialInventoryTransactionModel>> Post(MaterialInventoryTransactionRequest model)
-        {
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _materialInventoryService.CreateAsync(model, user);
+        return result.ToActionResult(
+            Url.Action("Get", "MaterialInventory", new { id = result.Data?.Id }));
+    }
 
-            var result = await _materialInventoryRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
-            return result.ToActionResult(
-                Url.Action("Get", "MaterialInventory", new { id = result.Data?.Id }));
-        }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await GetCurrentUserAsync(User);
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
-
-            var result = await _materialInventoryRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
-            return result.ToActionResult();
-        }
+        var result = await _materialInventoryService.DeleteAsync(id, user);
+        return result.ToActionResult();
     }
 }

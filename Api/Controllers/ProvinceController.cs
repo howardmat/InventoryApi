@@ -11,10 +11,10 @@ namespace Api.Controllers
     [ApiController]
     public class ProvinceController : InventoryControllerBase
     {
-        private readonly ProvinceRequestService _provinceService;
+        private readonly ProvinceEntityService _provinceService;
 
         public ProvinceController(
-            ProvinceRequestService provinceService)
+            ProvinceEntityService provinceService)
         {
             _provinceService = provinceService;
         }
@@ -22,14 +22,14 @@ namespace Api.Controllers
         [HttpGet("/country/{countryIsoCode}/province")]
         public async Task<ActionResult<IEnumerable<ProvinceModel>>> GetAllByCountry(string countryIsoCode)
         {
-            var result = await _provinceService.ProcessListRequestAsync(countryIsoCode);
+            var result = await _provinceService.ListAsync(countryIsoCode);
             return result.ToActionResult();
         }
 
         [HttpGet("/country/{countryIsoCode}/province/{isoCode}")]
         public async Task<ActionResult<ProvinceModel>> GetByCode(string countryIsoCode, string isoCode)
         {
-            var result = await _provinceService.ProcessGetRequestAsync(countryIsoCode, isoCode);
+            var result = await _provinceService.GetAsync(countryIsoCode, isoCode);
             return result.ToActionResult();
         }
     }

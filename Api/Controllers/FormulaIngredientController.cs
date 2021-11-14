@@ -6,46 +6,43 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[Authorize]
+[Route("/formula/ingredient")]
+[ApiController]
+public class FormulaIngredientController : InventoryControllerBase
 {
-    [Authorize]
-    [Route("/formula/ingredient")]
-    [ApiController]
-    public class FormulaIngredientController : InventoryControllerBase
+    private readonly FormulaIngredientEntityService _formulaIngredientEntityService;
+    private readonly FormulaIngredientRequestValidator _formulaIngredientRequestValidator;
+
+    public FormulaIngredientController(
+        FormulaIngredientEntityService formulaIngredientEntityService,
+        FormulaIngredientRequestValidator formulaIngredientRequestValidator,
+        AuthenticationDetailService authDetailService) : base(authDetailService)
     {
-        private readonly FormulaIngredientRequestService _formulaIngredientRequestService;
-        private readonly FormulaIngredientRequestValidator _formulaIngredientRequestValidator;
+        _formulaIngredientEntityService = formulaIngredientEntityService;
+        _formulaIngredientRequestValidator = formulaIngredientRequestValidator;
+    }
 
-        public FormulaIngredientController(
-            FormulaIngredientRequestService formulaIngredientRequestService,
-            FormulaIngredientRequestValidator formulaIngredientRequestValidator,
-            AuthenticationDetailService authDetailService) : base(authDetailService)
-        {
-            _formulaIngredientRequestService = formulaIngredientRequestService;
-            _formulaIngredientRequestValidator = formulaIngredientRequestValidator;
-        }
+    [HttpPost]
+    public async Task<ActionResult<FormulaIngredientModel>> Post(FormulaIngredientRequest model)
+    {
+        if (!_formulaIngredientRequestValidator.IsValid(model))
+            return _formulaIngredientRequestValidator.ServiceResponse.ToActionResult();
 
-        [HttpPost]
-        public async Task<ActionResult<FormulaIngredientModel>> Post(FormulaIngredientRequest model)
-        {
-            if (!_formulaIngredientRequestValidator.IsValid(model))
-                return _formulaIngredientRequestValidator.ServiceResponse.ToActionResult();
+        var user = await GetCurrentUserAsync(User);
 
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
+        var result = await _formulaIngredientEntityService.CreateAsync(model.FormulaId.Value, model.MaterialId.Value, model.Quantity.Value, user);
+        return result.ToActionResult();
+    }
 
-            var result = await _formulaIngredientRequestService.ProcessCreateRequestAsync(model, userId, tenantId);
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var user = await GetCurrentUserAsync(User);
+
+        var result = await _formulaIngredientEntityService.DeleteAsync(id, user);
             return result.ToActionResult();
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var userId = await GetCurrentUserIdAsync(User);
-            var tenantId = GetCurrentTenantId(User);
-
-            var result = await _formulaIngredientRequestService.ProcessDeleteRequestAsync(id, userId, tenantId);
-            return result.ToActionResult();
-        }
     }
 }
